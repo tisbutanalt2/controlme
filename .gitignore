@@ -1,0 +1,14 @@
+# Parcel cache
+.parcel-cache
+
+# Compiled App
+/app
+dist
+
+# NodeJS
+node_modules
+
+# Log files
+*.log
+
+testutil.bat

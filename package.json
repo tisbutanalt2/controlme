@@ -1,0 +1,114 @@
+{
+  "name": "controlme",
+  "version": "1.0.3",
+  "private": true,
+  "description": "A fun app to let others control your PC",
+  "license": "MIT",
+  "author": "tisbutanalt2",
+  "repository": "https://github.com/tisbutanalt2/controlme",
+  "main": "app/main.js",
+  "targets": {
+    "main": false
+  },
+  "scripts": {
+    "rebuild": "npm rebuild",
+    "postinstall": "electron-builder install-app-deps",
+    "start": "NODE_ENV=development electron app/main.js",
+    "watch:webserver": "parcel watch src/web/index.html --dist-dir app/web --public-url ./ --no-source-maps --no-hmr --no-cache",
+    "watch:webclient": "parcel watch src/server/web/index.html --dist-dir app/server/web --public-url ./ --no-source-maps --no-hmr --no-cache",
+    "watch:electron": "tsc --project tsconfig.electron.json && concurrently -n \"tsc,alias\" -k \"tsc -w --project tsconfig.electron.json\" \"tsc-alias -w -p tsconfig.electron.json --resolve-full-paths\"",
+    "watch": "concurrently -n \"webserver,webclient,electron\" -k \"bun run watch:webserver\" \"bun run watch:webclient\" \"bun run watch:electron\"",
+    "build:final": "electron-builder",
+    "build:electron": "tsc --project tsconfig.electron.json && tsc-alias -p tsconfig.electron.json --resolve-full-paths",
+    "build:webserver": "parcel build src/server/web/index.html --dist-dir app/server/web --public-url ./ --no-source-maps --no-cache",
+    "build:webclient": "parcel build src/web/index.html --dist-dir app/web --public-url ./ --no-source-maps --no-cache",
+    "build": "bun run build:webserver && bun run build:webclient && bun run build:electron && bun run build:final",
+    "node:start": "cross-env NODE_ENV=development electron app/main.js",
+    "node:watch": "concurrently -n \"webserver,webclient,electron\" -k \"npm run watch:webserver\" \"npm run watch:webclient\" \"npm run watch:electron\"",
+    "node:build": "npm run build:webserver && npm run build:webclient && npm run build:electron && npm run build:final"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@fontsource/roboto": "^5.0.13",
+    "@mui/material": "^5.15.18",
+    "axios": "^1.7.2",
+    "bcryptjs": "^2.4.3",
+    "camera-capture": "^0.0.11",
+    "electron-store": "8.2.0",
+    "electron-updater": "^6.1.8",
+    "electron-wallpaper-napi": "^0.0.5",
+    "express": "^4.19.2",
+    "get-folder-size": "^4.0.0",
+    "glob": "^10.3.16",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "ngrok": "^5.0.0-beta.2",
+    "puppeteer": "1.20.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "screenshot-desktop": "^1.15.0",
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5",
+    "systeminformation": "^5.22.9",
+    "wallpaper": "^7.2.1"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.12.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^4.17.21",
+    "@types/get-folder-size": "^3.0.4",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^20.12.12",
+    "@types/react": "^18.3.2",
+    "@types/react-dom": "^18.3.0",
+    "@types/screenshot-desktop": "^1.12.3",
+    "concurrently": "^8.2.2",
+    "electron": "^30.0.6",
+    "electron-builder": "^24.13.3",
+    "parcel": "^2.12.0",
+    "tsc-alias": "^1.8.10",
+    "typescript": "^5.4.5"
+  },
+  "build": {
+    "appId": "app.control.me",
+    "productName": "Control Me!",
+    "executableName": "controlme",
+    "files": [
+      "app/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "./resources",
+        "to": "resources",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "npmRebuild": true,
+    "win": {
+      "icon": "resources/icon.ico",
+      "target": "nsis",
+      "publish": [
+        "github"
+      ]
+    },
+    "nsis": {
+      "installerIcon": "resources/icon.ico",
+      "uninstallerIcon": "resources/icon.ico",
+      "runAfterFinish": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Control Me!"
+    },
+    "mac": {
+      "icon": "resources/icon.icns"
+    },
+    "linux": {
+      "icon": "resources/icon.png"
+    },
+    "asar": false
+  }
+}

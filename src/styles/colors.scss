@@ -1,0 +1,27 @@
+@mixin darkColors {
+    --c-background: #222;
+    --c-background-1: #333;
+    --c-background-2: #111;
+
+    --c-text: #fff;
+    --c-link: #88f;
+	--c-link-visited: #baf;
+    --c-error: #f44336;
+}
+
+@mixin lightColors {
+    --c-background: #fff;
+    --c-background-1: #eaeaea;
+    --c-background-2: #eee;
+
+    --c-text: #000;
+    --c-error: #f44;
+
+    --c-link: #0000EE;
+	--c-link-visited: #551A8B;
+}
+
+:root {
+    &:not(:has(body.light)) { @include darkColors; }
+    &:has(body.light) { @include lightColors; }
+}

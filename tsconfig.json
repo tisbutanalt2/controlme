@@ -1,0 +1,37 @@
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "module": "CommonJS",
+
+        "moduleResolution": "Node",
+
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "resolveJsonModule": true,
+
+        "jsx": "react-jsx",
+
+        "rootDir": "./src",
+        "outDir": "./app",
+
+        "removeComments": true,
+        "skipLibCheck": true,
+
+        "baseUrl": ".",
+        "paths": {
+            "@clientutils/*": ["src/clientutils/*"],
+            "@serverutils/*": ["src/serverutils/*"],
+            "@components/*": ["src/components/*"],
+            "@context/*": ["src/context/*"],
+            "@hooks/*": ["src/hooks/*"],
+            "@styles/*": ["src/styles/*"],
+            "@utils/*": ["src/utils/*"],
+            "@muim/*": ["node_modules/@mui/material/*"],
+            "@muii/*": ["node_modules/@mui/material-icons/*"],
+            "@/*": ["src/*"]
+        }
+    },
+
+    "include": ["src/**/*"],
+    "exclude": ["node_modules"]
+}

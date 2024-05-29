@@ -7,7 +7,7 @@ import SocketContext from '@context/Socket';
 import Functions from './Functions';
 
 // Import functions
-import OpenLink from './Functions/openLink';
+import OpenLink from './Functions/OpenLink';
 import UploadMedia from './Functions/UploadMedia';
 import UploadFiles from './Functions/UploadFiles';
 import SetBackground from './Functions/SetBackground';

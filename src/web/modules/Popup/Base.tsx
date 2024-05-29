@@ -44,6 +44,7 @@ const PopupBase: FC<PopupPropsBase> = props => {
                     if (height >= window.screen.height) div.style.top = '0px';
 
                     setLoaded(true);
+                    window.popupIpc.sendError('Loaded image :3')
                 }, 500);
             }
         }}

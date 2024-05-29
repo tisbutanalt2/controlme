@@ -107,6 +107,13 @@ app.on('ready', async () => {
         { type: 'separator' },
         ...(isDev? [
             {
+                label: 'Refresh popup windows',
+                click() {
+                    context.popupWindows.forEach(win => win.webContents.reload());
+                }
+            },
+
+            {
                 label: 'Close popup windows',
                 click() {
                     context.popupWindows.forEach(win => win.close());

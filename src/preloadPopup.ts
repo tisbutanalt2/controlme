@@ -17,7 +17,9 @@ const context = {
     },
 
     focus: () => ipcRenderer.send('popupFocus'),
-    blur: () => ipcRenderer.send('popupBlur')
+    blur: () => ipcRenderer.send('popupBlur'),
+
+    sendError: (err: any) => ipcRenderer.send('error', err)
 }
 
 declare global {

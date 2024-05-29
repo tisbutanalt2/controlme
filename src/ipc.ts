@@ -198,3 +198,8 @@ ipcMain.on('popupBlur', e => {
     popupWindow.setIgnoreMouseEvents(true, { forward: true });
     popupWindow.blur();
 });
+
+ipcMain.on('error', (e, err) => {
+    console.log(`Error from window ID ${e.sender.id}`);
+    console.error(err);
+});

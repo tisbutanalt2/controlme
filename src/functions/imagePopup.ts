@@ -3,16 +3,17 @@ import context from '@/context';
 import pickRandom from '@utils/array/pickRandom';
 import { randomUUID } from 'crypto';
 import { join } from 'path';
+import { PopupPropsBase } from '@/web/modules/Popup/Base';
 
 export default async function imagePopup(props: ImagePopupProps) {
     const location = join(context.defaultMediaFolder, props.src);
-    console.log(location);
 
     const popupWindow = pickRandom(context.popupWindows);
     console.log(`Sending popup to window ID ${popupWindow?.webContents.id}`);
 
     popupWindow?.webContents.send('popup', {
         id: randomUUID(),
+        type: 'image',
         src: location
-    } as ImagePopupProps);
+    } as PopupPropsBase);
 }

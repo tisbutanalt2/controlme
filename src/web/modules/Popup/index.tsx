@@ -40,7 +40,6 @@ const Popup = () => {
         });
 
         window.popupIpc.on('popup', (props: PopupProps) => {
-            console.log(props);
             setPopups(prev => [...prev, props]);
         });
     }, [mounted]);

@@ -185,18 +185,20 @@ ipcMain.handle('openFileFolder', async () => {
 
 ipcMain.on('popupFocus', e => {
     const popupWindow = context.popupWindows.find(w => w.webContents.id === e.sender.id);
-    if (!popupWindow) return;
+    if (!popupWindow || context.focusedPopupWindowIds.has(popupWindow.webContents.id)) return;
 
     popupWindow.setIgnoreMouseEvents(false);
     popupWindow.focus();
+    context.focusedPopupWindowIds.delete(popupWindow.webContents.id);
 });
 
 ipcMain.on('popupBlur', e => {
     const popupWindow = context.popupWindows.find(w => w.webContents.id === e.sender.id);
-    if (!popupWindow) return;
+    if (!popupWindow || !context.focusedPopupWindowIds.has(popupWindow.webContents.id)) return;
 
     popupWindow.setIgnoreMouseEvents(true, { forward: true });
     popupWindow.blur();
+    context.focusedPopupWindowIds.delete(popupWindow.webContents.id);
 });
 
 ipcMain.on('error', (e, err) => {

@@ -24,7 +24,7 @@ const PopupBase: FC<PopupPropsBase> = props => {
     const [loaded, setLoaded] = useState<boolean>(false);
 
     const onClick = props.ignoreClick? undefined: useCallback(() => {
-        setPopups(prev => prev.filter(popup => popup.id !== props.id));
+        setPopups(prev => [...prev.filter(popup => popup.id !== props.id)]);
     }, [props.ignoreClick]);
 
     return <div

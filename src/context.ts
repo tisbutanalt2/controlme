@@ -17,6 +17,8 @@ const context = {
     webPath: join(__dirname, 'web', 'index.html'),
 
     popupWindows: [] as BrowserWindow[],
+    focusedPopupWindowIds: new Set<number>(),
+
     wallpaperWindows: [] as BrowserWindow[],
 
     canExit: false,

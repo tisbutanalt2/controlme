@@ -104,15 +104,31 @@ app.on('ready', async () => {
             if (!context.main) createWindow();
             context.main?.show();
         }},
+
+        {
+            label: 'Refresh popup windows',
+            click() {
+                context.popupWindows.forEach(win => {
+                    win.webContents.reload();
+                    win.setIgnoreMouseEvents(true, { forward: true });
+                    context.focusedPopupWindowIds.delete(win.webContents.id);
+                });
+            }
+        },
+
+        {
+            label: 'Restore mouse (popups)',
+            click() {
+                context.popupWindows.forEach(win => {
+                    win.setIgnoreMouseEvents(true, { forward: true });
+                    win.blur();
+                    context.focusedPopupWindowIds.delete(win.webContents.id);
+                });
+            }
+        },
+
         { type: 'separator' },
         ...(isDev? [
-            {
-                label: 'Refresh popup windows',
-                click() {
-                    context.popupWindows.forEach(win => win.webContents.reload());
-                }
-            },
-
             {
                 label: 'Close popup windows',
                 click() {
@@ -162,6 +178,7 @@ app.on('ready', async () => {
             skipTaskbar: true,
             fullscreen: true,
             minimizable: false,
+            resizable: false,
 
             webPreferences: {
                 nodeIntegration: false,

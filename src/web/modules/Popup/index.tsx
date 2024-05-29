@@ -19,7 +19,6 @@ const Popup = () => {
         if (mounted) return;
         setMounted(true);
 
-        let focused = false;
         window.addEventListener('mousemove', e => {
             const target = document.elementFromPoint(e.clientX, e.clientY);
             const element = (
@@ -28,15 +27,10 @@ const Popup = () => {
                 target?.getAttribute('data-hover') !== null
             )? target: null;
 
-            if (element) {
-                !focused && window.popupIpc.focus();
-                focused = true;
-            }
-
-            else {
-                focused && window.popupIpc.blur();
-                focused = false;
-            }
+            if (element)
+                window.popupIpc.focus();
+            else
+                window.popupIpc.blur();
         });
 
         window.popupIpc.on('popup', (props: PopupProps) => {

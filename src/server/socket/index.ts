@@ -90,4 +90,6 @@ export default function setupSockets(server: Server) {
             socketIndex >= 0 && context.sockets.splice(socketIndex, 1);
         });
     });
+
+    return io;
 }

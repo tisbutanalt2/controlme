@@ -26,6 +26,9 @@
             "@hooks/*": ["src/hooks/*"],
             "@styles/*": ["src/styles/*"],
             "@utils/*": ["src/utils/*"],
+            "@main/*": ["src/main/*"],
+            "@server/*": ["src/server/*", "src/server/index"],
+            "@preload/*": ["src/preload/*"],
             "@muim/*": ["node_modules/@mui/material/*"],
             "@muii/*": ["node_modules/@mui/material-icons/*"],
             "@/*": ["src/*"]

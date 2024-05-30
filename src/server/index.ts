@@ -24,7 +24,7 @@ export default function startServer(port?: number) {
     // Add each router
     routers.forEach(r => app.use(r));
 
-    setupSockets(server);
+    const io = setupSockets(server);
 
     return new Promise<ControlMe.ServerResponse>(res => {
         server.listen(port ?? 0, () => {
@@ -32,7 +32,8 @@ export default function startServer(port?: number) {
             res({
                 express: app,
                 port: assignedPort,
-                server
+                http: server,
+                io
             });
         });
     });

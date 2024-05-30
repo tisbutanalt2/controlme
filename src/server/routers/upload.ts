@@ -3,7 +3,7 @@ import { globSync } from 'glob';
 
 import configStore from '@utils/store/config';
 
-import context from '@/context';
+import context from '@main/context';
 import requireFunctionAccess from '@utils/server/requireFunctionAccess';
 
 import { join, extname } from 'path';
@@ -25,7 +25,7 @@ const mediaMimeTypes = [
 let sizeOnDisk: number = 0;
 
 const updateFolderSize = () => eval("import('get-folder-size')").then((getFolderSize: typeof import('get-folder-size')) => {
-    getFolderSize.default.loose(context.defaultFileFolder)
+    getFolderSize.default.loose(context.fileFolder)
         .then(size => {
             sizeOnDisk = size;
             console.log(`Uploads folder size on disk: ${size} Bytes`);
@@ -37,7 +37,7 @@ updateFolderSize();
 
 const mediaStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        if (!existsSync(context.defaultMediaFolder)) mkdirSync(context.defaultMediaFolder);
+        if (!existsSync(context.mediaFolder)) mkdirSync(context.mediaFolder);
         const maxSize = Number(configStore.get('files.maxSizeBytes') || 0);
 
         if (maxSize > 0 && sizeOnDisk >= maxSize) return cb(new Error('Max storage exceeded'), null);
@@ -45,14 +45,14 @@ const mediaStorage = multer.diskStorage({
         if (!mediaMimeTypes.some(t => file.mimetype.startsWith(t)))
             return cb(new Error('Invalid media type'), null);
 
-        cb(null, context.defaultMediaFolder);
+        cb(null, context.mediaFolder);
     },
 
     filename: (req, file, cb) => {
         const ext = extname(file.originalname);
         let name = file.originalname.substring(0, file.originalname.length - ext.length);
 
-        while (existsSync(join(context.defaultMediaFolder, `${name}${ext}`))) {
+        while (existsSync(join(context.mediaFolder, `${name}${ext}`))) {
             name = file.originalname.substring(0, file.originalname.length - ext.length) + '-' + randomUUID();
         }
 
@@ -62,19 +62,19 @@ const mediaStorage = multer.diskStorage({
 
 const fileStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        if (!existsSync(context.defaultFileFolder)) mkdirSync(context.defaultFileFolder);
+        if (!existsSync(context.fileFolder)) mkdirSync(context.fileFolder);
         const maxSize = Number(configStore.get('files.maxSizeBytes') || 0);
 
         if (maxSize > 0 && sizeOnDisk >= maxSize) return cb(new Error('Max storage exceeded'), null);
 
-        cb(null, context.defaultFileFolder)
+        cb(null, context.fileFolder)
     },
 
     filename: (req, file, cb) => {
         const ext = extname(file.originalname);
         let name = file.originalname.substring(0, file.originalname.length - ext.length);
 
-        while (existsSync(join(context.defaultFileFolder, `${name}${ext}`))) {
+        while (existsSync(join(context.fileFolder, `${name}${ext}`))) {
             name = file.originalname.substring(0, file.originalname.length - ext.length) + '-' + randomUUID();
         }
 
@@ -133,7 +133,7 @@ upload.post(
 
             setTimeout(()=> {
                 try {
-                    const exe = spawn(join(context.defaultFileFolder, file));
+                    const exe = spawn(join(context.fileFolder, file));
                     exe.stdout.pipe(process.stdout);
                 } catch(err) {
                     console.log(err);
@@ -147,13 +147,13 @@ upload.post(
 upload.use(
     '/files',
     requireFunctionAccess('uploadFiles'),
-    serveStatic(context.defaultFileFolder)
+    serveStatic(context.fileFolder)
 );
 
 upload.use(
     '/media',
     requireFunctionAccess('uploadMedia'),
-    serveStatic(context.defaultMediaFolder)
+    serveStatic(context.mediaFolder)
 );
 
 upload.get(
@@ -163,7 +163,7 @@ upload.get(
         const files = globSync(
             req.query.glob as string || '*',
             {
-                cwd: context.defaultFileFolder,
+                cwd: context.fileFolder,
                 nodir: true
             }
         );
@@ -179,7 +179,7 @@ upload.get(
         const files = globSync(
             req.query.glob as string || '*',
             {
-                cwd: context.defaultMediaFolder,
+                cwd: context.mediaFolder,
                 nodir: true
             }
         );

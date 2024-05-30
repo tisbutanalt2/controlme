@@ -1,5 +1,5 @@
 # Control Me!
-<img src="./resources/icon.png" width="64" height="64">
+<img src="./assets/icon.png" width="64" height="64">
 
 A fun app made with Electron to let others control your PC.
 

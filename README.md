@@ -1,7 +1,24 @@
 # Control Me!
-<img src="./resources/icon.png" width="64" height="64">
+<img src="./assets/icon.png" width="64" height="64">
 
-A fun app made with Electron to let others control your PC.
+A fun app made with Electron to let others control your PC in various (mostly) safe ways!
+
+## Features
+**This list is subject to change.**
+
+Features are marked with a checkbox which determines whether it has been implemented or not:
+
+- [x] Change wallpaper
+- [x] Image popups
+- [ ] Video popups*
+- [ ] Writing prompts*
+- [ ] Play audio*
+- [x] Open URLs
+- [x] Access webcam
+- [x] Take screenshots
+- [x] Upload files and media
+- [x] Autorun executable files
+- [ ] Run terminal commands 
 
 ## Installation
 The app is shipped with an installer. Download it and run it.

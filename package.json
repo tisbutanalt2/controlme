@@ -6,14 +6,14 @@
   "license": "MIT",
   "author": "tisbutanalt2",
   "repository": "https://github.com/tisbutanalt2/controlme",
-  "main": "app/main.js",
+  "main": "app/main/index.js",
   "targets": {
     "main": false
   },
   "scripts": {
     "rebuild": "npm rebuild",
     "postinstall": "electron-builder install-app-deps",
-    "start": "NODE_ENV=development electron app/main.js",
+    "start": "NODE_ENV=development electron app/main/index.js",
     "watch:webserver": "parcel watch src/web/index.html --dist-dir app/web --public-url ./ --no-source-maps --no-hmr --no-cache",
     "watch:webclient": "parcel watch src/server/web/index.html --dist-dir app/server/web --public-url ./ --no-source-maps --no-hmr --no-cache",
     "watch:electron": "tsc --project tsconfig.electron.json && concurrently -n \"tsc,alias\" -k \"tsc -w --project tsconfig.electron.json\" \"tsc-alias -w -p tsconfig.electron.json --resolve-full-paths\"",
@@ -44,13 +44,10 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
     "ngrok": "^5.0.0-beta.2",
-    "puppeteer": "1.20.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "screenshot-desktop": "^1.15.0",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
-    "systeminformation": "^5.22.9",
     "wallpaper": "^7.2.1"
   },
   "devDependencies": {
@@ -63,7 +60,6 @@
     "@types/node": "^20.12.12",
     "@types/react": "^18.3.2",
     "@types/react-dom": "^18.3.0",
-    "@types/screenshot-desktop": "^1.12.3",
     "concurrently": "^8.2.2",
     "electron": "^30.0.6",
     "electron-builder": "^24.13.3",
@@ -80,8 +76,8 @@
     ],
     "extraResources": [
       {
-        "from": "./resources",
-        "to": "resources",
+        "from": "./assets",
+        "to": "assets",
         "filter": [
           "**/*"
         ]
@@ -89,26 +85,25 @@
     ],
     "npmRebuild": true,
     "win": {
-      "icon": "resources/icon.ico",
+      "icon": "assets/icon.ico",
       "target": "nsis",
       "publish": [
         "github"
       ]
     },
     "nsis": {
-      "installerIcon": "resources/icon.ico",
-      "uninstallerIcon": "resources/icon.ico",
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
       "runAfterFinish": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Control Me!"
     },
     "mac": {
-      "icon": "resources/icon.icns"
+      "icon": "assets/icon.icns"
     },
     "linux": {
-      "icon": "resources/icon.png"
-    },
-    "asar": false
+      "icon": "assets/icon.png"
+    }
   }
 }

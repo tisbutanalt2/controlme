@@ -80,18 +80,31 @@ declare global {
             requireAll?: boolean
         }
 
-        type ServerStatus = 'closed'|'starting'|'open';
-        type NgrokStatus = 'closed'|'open'|'error';
+        type ServerStatus = 'closed'|'starting'|'open'|'error'|(string & {});
+        type NgrokStatus = 'closed'|'starting'|'open'|'error'|(string & {});
+
+        interface Statuses {
+            server: ServerStatus,
+            ngrok: NgrokStatus
+        }
+
+        interface Errors {
+            server: string;
+            ngrok: string;
+        }
 
         interface ServerResponse {
             express: ReturnType<typeof import('express')>;
-            server: import('http').Server;
+            http: import('http').Server;
             port: number;
+            io: Socket.Server;
+            error?: string;
         }
 
         interface NgrokResponse {
             url: string;
             disconnect(): void;
+            error?: string;
         }
     }
 }

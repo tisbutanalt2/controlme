@@ -7,7 +7,7 @@ import Tab from '@components/Tab';
 import Share from './tabs/Share';
 import Settings from './tabs/Settings';
 
-const App = () => {
+const Main = () => {
 
     return <Providers>
         <Tabs searchParam="tab">
@@ -46,4 +46,4 @@ const App = () => {
     </Providers>
 }
 
-export default App;
+export default Main;

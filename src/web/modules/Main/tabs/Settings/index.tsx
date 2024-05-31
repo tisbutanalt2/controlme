@@ -33,7 +33,7 @@ const Settings = () => {
         if (mounted || fetchDone) return;
         setMounted(true);
 
-        window.ipc.getConfig().then(cfg => {
+        window.ipcMain.getConfig().then(cfg => {
             setSettings(cfg);
             setLastSettings(cfg);
             setFetchDone(true);
@@ -47,7 +47,7 @@ const Settings = () => {
         setLastSettings(prev => {
             for (const k in settings) {
                 if (settings[k] !== prev[k]) {
-                    window.ipc.setConfigValue(k, settings[k]);
+                    window.ipcMain.setConfigValue(k, settings[k]);
                 }
             }
 

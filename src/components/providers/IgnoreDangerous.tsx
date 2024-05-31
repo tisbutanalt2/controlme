@@ -11,13 +11,13 @@ const IgnoreDangerousProvider: FC = ({ children }) => {
         if (!mounted && !valueFetched) {
             setMounted(true);
 
-            window.ipc.getConfigValue('general.disableWarnings').then((ignore: boolean) => {
+            window.ipcMain.getConfigValue('general.disableWarnings').then((ignore: boolean) => {
                 setIgnoreDangerous(ignore);
                 setValueFetched(true);
             });
         }
 
-        valueFetched && window.ipc.setConfigValue('general.disableWarnings', ignoreDangerous);
+        valueFetched && window.ipcMain.setConfigValue('general.disableWarnings', ignoreDangerous);
     }, [ignoreDangerous, mounted, valueFetched]);
 
     return <IgnoreDangerousContext.Provider value={[ignoreDangerous, setIgnoreDangerous]}>

@@ -4,7 +4,7 @@ const About = () => {
     const [version, setVersion] = useState<string|null>(null);
 
     useEffect(() => {
-        window.ipc.getVersion().then(setVersion);
+        window.ipc.version().then(setVersion);
     }, []);
 
     return <>

@@ -1,5 +1,5 @@
 # Control Me!
-<img src="./assets/icon.png" width="64" height="64">
+<img src="./resources/icon.png" width="64" height="64">
 
 A fun app made with Electron to let others control your PC.
 
@@ -14,3 +14,8 @@ A fun app made with Electron to let others control your PC.
 8. Navigate to the "Share" tab
 9. Create a share link for your friends!
 10. Have fun!
+
+## Troubleshooting
+- Errors with Ngrok usually mean that you have another instance of the app running
+- If clicking the Ngrok "Start" button does nothing, ensure your server is started first
+- Autorunning exes that require admin permissions will crash if you don't run the app as admin

@@ -20,12 +20,12 @@ const NgrokSettings = () => {
         if (mounted) return;
         setMounted(true);
 
-        window.ipc.getNgrokStatus()
+        window.ipc.ngrokStatus()
             .then((status: ControlMe.NgrokStatus) => {
                 setNgrokStatus(status);
             }).catch(console.error);
 
-        window.ipc.getNgrokError()
+        window.ipc.ngrokError()
             .then((err: string) => {
                 setNgrokError(err);
             }).catch(console.error);
@@ -36,13 +36,13 @@ const NgrokSettings = () => {
 
             switch(status) {
                 case 'open':
-                    window.ipc.getNgrokURL().then(setNgrokURL);
+                    window.ipc.ngrokUrl().then(setNgrokURL);
                     break;
                 case 'closed':
                     setNgrokURL(null);
                     break;
                 case 'error':
-                    window.ipc.getNgrokError().then(setNgrokError);
+                    window.ipc.ngrokError().then(setNgrokError);
                     break;
             }
         });

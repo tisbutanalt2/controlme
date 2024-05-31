@@ -22,7 +22,7 @@ export default function createWindow() {
         autoHideMenuBar: true,
 
         webPreferences: {
-            nodeIntegration: false,
+            nodeIntegration: true,
             preload: context.preloadPaths.main
         }
     });
@@ -31,5 +31,6 @@ export default function createWindow() {
         query: { module: 'main' }
     });
 
+    win.on('ready-to-show', win.show);
     return win;
 }

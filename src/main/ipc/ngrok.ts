@@ -23,6 +23,8 @@ export const startNgrok = async () => {
     }
 
     context.statuses.ngrok = 'open';
+    context.mainWindow?.webContents.send('ngrokUrl', res.url);
+
     context.ngrok = res;
 }
 
@@ -37,3 +39,5 @@ export const stopNgrok = () => {
 
 ipcMain.handle('startNgrok', () => startNgrok());
 ipcMain.handle('stopNgrok', () => stopNgrok());
+
+ipcMain.handle('ngrokUrl', () => context.ngrok?.url);

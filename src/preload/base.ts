@@ -15,8 +15,10 @@ const baseContext = {
         );
     },
 
-    version: () => ipcRenderer.invoke('version'),
-    sendError: (err: any) => ipcRenderer.send('error', err)
+    version: () => ipcRenderer.invoke('version') as Promise<string>,
+    sendError: (err: any) => ipcRenderer.send('error', err),
+
+    writeToClipboard: (str: string) => ipcRenderer.send('writeToClipboard', str)
 }
 
 export default baseContext;

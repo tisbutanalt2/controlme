@@ -6,7 +6,7 @@ ipcMain.handle('config.get', (e, key?: string) => {
     return configStore.get(key);
 });
 
-ipcMain.handle('config.get', (e, key: string, value: any) => {
+ipcMain.handle('config.set', (e, key: string, value: any) => {
     configStore.set(key, value);
 });
 

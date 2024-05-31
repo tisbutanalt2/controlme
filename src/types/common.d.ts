@@ -16,6 +16,7 @@ declare global {
 
     /** React.FC */
     type FC<Props = {}> = React.FC<React.PropsWithChildren<Props>>;
+    type FCC<Props = {}> = FC<Props & { className?: string }>;
 
     type ColorMode = 'light'|'dark';
 }

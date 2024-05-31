@@ -1,5 +1,5 @@
 import { Notification, ipcMain } from 'electron';
-import { default as startExpress } from '@server/';
+import { default as startExpress } from '@server/index';
 
 import context from '@main/context';
 import configStore from '@utils/store/config';

@@ -1,7 +1,7 @@
 import { Server } from 'http';
 import { Server as IO } from 'socket.io';
 
-import context from '@/context';
+import context from '@main/context';
 import getFunctionAccess from '@utils/server/getFunctionAccess';
 
 import decodeUserToken from '@utils/server/decodeUserToken';

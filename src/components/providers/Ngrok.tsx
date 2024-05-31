@@ -10,8 +10,8 @@ const NgrokProvider: FC = ({ children }) => {
         if (mounted) return;
         setMounted(true);
 
-        window.ipc.on('ngrokURL', (url: string) => setNgrokURL(url || null));
-        window.ipc.getNgrokURL().then((url?: string) => {
+        window.ipcMain.on('ngrokURL', (url: string) => setNgrokURL(url || null));
+        window.ipcMain.ngrokUrl().then((url?: string) => {
             setNgrokURL(url || null);
         });
     }, [mounted]);

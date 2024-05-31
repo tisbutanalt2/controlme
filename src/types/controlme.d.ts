@@ -84,8 +84,8 @@ declare global {
         type NgrokStatus = 'closed'|'starting'|'open'|'error'|(string & {});
 
         interface Statuses {
-            server: ServerStatus,
-            ngrok: NgrokStatus
+            server: ServerStatus|null,
+            ngrok: NgrokStatus|null
         }
 
         interface Errors {

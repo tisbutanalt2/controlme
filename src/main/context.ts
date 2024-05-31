@@ -1,11 +1,15 @@
 import { app, nativeImage } from 'electron';
-import { join } from 'path';
+import { join, resolve } from 'path';
 
 import StatusProxy from './statusProxy';
+import getAssetPath from '@utils/getAssetPath';
 
-const appIconPath = join(__dirname, 'assets', 'icon.png');
+const appPath = resolve(app.getAppPath(), '..');
+
+const appIconPath = getAssetPath('icon.png');
+const preloadPath = join(appPath, 'preload');
+
 const userDataPath = app.getPath('userData');
-const preloadPath = join(__dirname, 'preload');
 
 const context = {
     version: app.getVersion(),
@@ -16,7 +20,7 @@ const context = {
         backgroundTasks: null as Electron.BrowserWindow|null
     },
 
-    webPath: join(__dirname, 'web', 'index.html'),
+    webPath: join(appPath, 'web', 'index.html'),
     preloadPaths: {
         main: join(preloadPath, 'main', 'index.js'),
         popup: join(preloadPath, 'popup.js')
@@ -35,9 +39,12 @@ const context = {
     statuses: new StatusProxy('Status', {
         server: 'closed',
         ngrok: 'closed'
-    }),
+    }) as unknown as ControlMe.Statuses,
 
-    errors: new StatusProxy('Error') as unknown as ControlMe.Errors,
+    errors: new StatusProxy('Error', {
+        server: null,
+        ngrok: null
+    }) as unknown as ControlMe.Errors,
 
     server: null as ControlMe.ServerResponse|null,
     ngrok: null as ControlMe.NgrokResponse|null

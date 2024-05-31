@@ -15,15 +15,17 @@ const ServerSettings = () => {
         if (mounted) return;
         setMounted(true);
 
-        window.ipc.getServerStatus()
+        window.ipcMain.serverStatus()
             .then((status: ControlMe.ServerStatus) => {
                 setServerStatus(status);
             }).catch(console.error);
 
-        window.ipc.on('serverStatus', (status: ControlMe.ServerStatus) => {
+        window.ipcMain.on('serverStatus', (status: ControlMe.ServerStatus) => {
             setServerStatus(status);
         });
     }, [mounted]);
+
+    console.log(serverStatus);
 
     return <TabForm id="settings-server" name="server">
         <Field

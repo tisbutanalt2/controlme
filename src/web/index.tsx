@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import { getSearchParam } from '@utils/getSearch';
 
-import App from './modules/App';
+import Main from './modules/Main';
 import Popup from './modules/Popup';
 
 const appModule = getSearchParam('module');
@@ -11,11 +11,11 @@ document.body.classList.add(`module-${appModule}`);
 
 switch(appModule) {
     case 'main':
-        root.render(<App />);
+        root.render(<Main />);
         break;
-    case 'wallpaper':
+    /*case 'wallpaper':
         root.render(<>Wallpaper module :3</>);
-        break;
+        break;*/
     case 'popup':
         root.render(<Popup />);
         break;

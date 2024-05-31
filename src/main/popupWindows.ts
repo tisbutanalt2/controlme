@@ -24,7 +24,7 @@ export default function createPopupWindows() {
 
             title: `${appTitle} Popup Overlay`,
             webPreferences: {
-                nodeIntegration: false,
+                nodeIntegration: true,
                 preload: context.preloadPaths.popup
             },
 

@@ -39,4 +39,6 @@ app.on('ready', () => {
                 });
             })
     }
+
+    console.log(`Running app version ${app.getVersion()}`);
 });

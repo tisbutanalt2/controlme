@@ -17,12 +17,12 @@ const ColorModeProvider: FC<{ noIpc?: boolean }> = ({ children, noIpc }) => {
 
     const getStoredMode = useCallback(() => {
         if (noIpc) return Promise.resolve(localStorage.getItem('theme') !== 'light');
-        return window.ipc.getConfigValue('appearance.darkTheme');
+        return window.ipcMain.getConfigValue('appearance.darkTheme');
     }, [noIpc]);
 
     const setStoredMode = useCallback(() => {
         if (noIpc) return localStorage.setItem('theme', colorMode);
-        window.ipc.setConfigValue('appearance.darkTheme', colorMode === 'dark');
+        window.ipcMain.setConfigValue('appearance.darkTheme', colorMode === 'dark');
     }, [noIpc, colorMode]);
 
     useEffect(() => {

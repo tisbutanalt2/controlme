@@ -1,4 +1,4 @@
-import { Tray, Menu } from 'electron';
+import { app, Tray, Menu } from 'electron';
 import context from '@main/context';
 
 import { appTitle, isDev } from '@utils/constants';
@@ -19,6 +19,13 @@ export default function createTray() {
                 win.webContents.reload();
                 win.setIgnoreMouseEvents(true, { forward: true });
             })
+        },
+
+        { type: 'separator' },
+
+        {
+            label: 'Exit',
+            click: app.quit
         }
     ];
 

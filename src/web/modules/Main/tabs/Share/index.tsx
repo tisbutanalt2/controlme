@@ -27,11 +27,11 @@ const Share = () => {
         if (mounted) return;
         setMounted(true);
 
-        window.ipc.on('shareLinkAdded', (link: Auth.ShareLink) => {
+        window.ipc.on('shareLink.added', (link: Auth.ShareLink) => {
             setLinks(prev => [...prev, link]);
         });
 
-        window.ipc.on('shareLinkRemoved', (id: string) => {
+        window.ipc.on('shareLink.deleted', (id: string) => {
             setNewest(prev => prev === id? null: prev);
             setLinks(prev => prev.filter(l => l.id !== id));
         });

@@ -1,13 +1,13 @@
 import { PromptCaller } from '@context/Prompt';
 
-export const dangerousOption = (caller: PromptCaller, messageOrVeryDangerous?: string|boolean) => caller({
+export const dangerousOption = (caller: PromptCaller, msgOrWarningLevel: ((string & {})|'medium'|'high') = 'medium') => caller({
     title: 'Dangerous option',
-    message: (typeof messageOrVeryDangerous === 'string')
-        ? messageOrVeryDangerous
-        : (messageOrVeryDangerous
-            ? 'This option is dangerous, and may cause damage to your computer. Are you sure you want to enable it?'
-            : 'This option could be dangerous. Are you sure you want to enable it?'
-        ),
+    message: msgOrWarningLevel === 'high'
+        ?'This option is dangerous, and may cause damage to your computer. Are you sure you want to continue?'
+        :msgOrWarningLevel === 'medium'
+        ?'This option could be dangerous. Are you sure you want to enable it?'
+    :(msgOrWarningLevel),
+
     actions: [
         {
             name: 'cancel',

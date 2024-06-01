@@ -93,19 +93,21 @@ declare global {
             ngrok: string;
         }
 
-        interface ServerResponse {
+        interface Server {
             express: ReturnType<typeof import('express')>;
             http: import('http').Server;
             port: number;
             io: Socket.Server;
-            error?: string;
         }
 
-        interface NgrokResponse {
+        type ServerResponse = Server|string;
+
+        type Ngrok = {
             url: string;
-            disconnect(): void;
-            error?: string;
-        }
+            tunnel: import('@ngrok/ngrok').Listener;
+        };
+
+        type NgrokResponse = Ngrok|string;
     }
 }
 

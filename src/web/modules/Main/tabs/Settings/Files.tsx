@@ -2,12 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSettingsContext } from '.';
 
 import TabForm from './TabForm';
-import Field from '@components/Field';
-
-import Button from '@muim/Button';
-import Stack from '@muim/Stack';
-
-import FormHelperText from '@muim/FormHelperText';
+import UI from '@components/ui';
 
 const unitSize = (unit?: string) => (
     unit === 'b'? 1:
@@ -32,16 +27,17 @@ const FileSettings = () => {
         }));
     }, [unit]);
 
+    // TODO renovation
     return <>
-        <Button
+        {/*<UI.Button
             variant="outlined"
-            onClick={window.ipc.openFileFolder}
+            onClick={window.ipcMain.openFileFolder}
             sx={{ mb: '24px' }}
-        >Open uploaded files</Button>
+>Open uploaded files</UI.Button>*/}
         
         <TabForm id="settings-functions" name="files">
-            <Stack direction="row" gap="8px">
-                <Field
+            <UI.Stack>
+                <UI.Field
                     name="maxSizeBytes"
                     type="number"
                     label="Folder size limit"
@@ -49,7 +45,7 @@ const FileSettings = () => {
                     min={0}
                     sx={{ minWidth: '60px', width: '140px' }}
                     value={maxSizeInput}
-                    onChange={(k, v) => {
+                    onChange={v => {
                         setMaxSizeInput(v);
                         setSettings(prev => ({
                             ...prev,
@@ -61,7 +57,7 @@ const FileSettings = () => {
                     }}
                 />
 
-                <Field
+                <UI.Field
                     name="maxSizeUnit"
                     type="select"
                     label="Unit"
@@ -72,11 +68,11 @@ const FileSettings = () => {
                     ]}
                     sx={{ width: '100px' }}
                 />
-            </Stack>
+            </UI.Stack>
 
-            <FormHelperText>Set the max amount of space the uploads folder can use, may exceed the size during singular large uploads, as the size is updated after the upload has finished</FormHelperText>
+            <UI.MUI.HelperText>Set the max amount of space the uploads folder can use, may exceed the size during singular large uploads, as the size is updated after the upload has finished</UI.MUI.HelperText>
 
-            <Field
+            <UI.Field
                 name="maxMediaUploads"
                 type="number"
                 label="Max media upload count"
@@ -85,7 +81,7 @@ const FileSettings = () => {
                 sx={{ mt: '24px', width: '170px' }}
             />
 
-            <Field
+            <UI.Field
                 name="maxFileUploads"
                 type="number"
                 label="Max file upload count"

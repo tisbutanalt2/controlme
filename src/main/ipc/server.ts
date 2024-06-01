@@ -22,10 +22,10 @@ export const startServer = async (port: number = configStore.get('server.port'))
             return;
         }
 
-        const res = await startExpress(port)
-        if (res.error) {
+        const res = await startExpress(port);
+        if (typeof res !== 'object') {
             context.statuses.server = 'error';
-            context.errors.server = sanitizeError(res.error);
+            context.errors.server = sanitizeError(res);
 
             context.server = null;
             return res;
@@ -61,7 +61,7 @@ const closeServer = () => {
 
 export const stopServer = async () => {
     if (context.statuses.server !== 'open') return console.warn('Server was attempted closed when not running');
-    if (context.statuses.ngrok !== 'closed') context.ngrok?.disconnect();
+    if (context.statuses.ngrok !== 'closed') context.ngrok?.tunnel.close();
 
     context.server.io.close(closeServer);
 

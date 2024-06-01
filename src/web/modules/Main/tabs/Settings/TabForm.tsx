@@ -1,5 +1,5 @@
 import { useSettingsContext } from '.';
-import Form from '@components/Form';
+import Form from '@appui/Form';
 
 interface Props {
     id: string;

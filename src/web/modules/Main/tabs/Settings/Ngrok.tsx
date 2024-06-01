@@ -2,11 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNgrokState } from '@context/Ngrok';
 
 import TabForm from './TabForm';
-import Field from '@components/Field';
-
-import Button from '@muim/Button';
-import Stack from '@muim/Stack';
-import FormHelperText from '@muim/FormHelperText';
+import UI from '@components/ui';
 
 const NgrokSettings = () => {
     const [ngrokStatus, setNgrokStatus] = useState<ControlMe.NgrokStatus>('closed');
@@ -49,14 +45,14 @@ const NgrokSettings = () => {
     }, [mounted]);
 
     return <TabForm id="settings-ngrok" name="ngrok">
-        <Field
+        <UI.Field
             name="autoStart"
             type="switch"
             label="Auto start"
             description="Automatically starts the tunnel when the app is launched"
         />
 
-        <Field
+        <UI.Field
             name="authToken"
             type="text"
             label="Auth token"
@@ -64,16 +60,16 @@ const NgrokSettings = () => {
             sx={{ mt: '24px', width: '400px' }}
         />
 
-        <Field
+        <UI.Field
             name="domain"
             type="text"
             label="Domain"
-            description="Set this if you've reserved an Ngrok domain, Requires paid Ngrok plan."
+            description="Set this if you've reserved an Ngrok domain"
             sx={{ mt: '12px', width: '300px' }}
         />
 
-        <Stack direction="row" columnGap="12px" mt="24px">
-            <Button
+        <UI.Stack direction="row" columnGap="12px" mt="24px">
+            <UI.Button
                 disabled={(ngrokStatus !== 'closed') || waitingForNewStatus}
                 variant="outlined"
                 color="success"
@@ -81,9 +77,9 @@ const NgrokSettings = () => {
                     setWaitingForNewStatus(true);
                     window.ipc.startNgrok();
                 }}
-            >Start</Button>
+            >Start</UI.Button>
 
-            <Button
+            <UI.Button
                 disabled={(ngrokStatus !== 'open') || waitingForNewStatus}
                 variant="outlined"
                 color="error"
@@ -91,9 +87,9 @@ const NgrokSettings = () => {
                     setWaitingForNewStatus(true);
                     window.ipc.stopNgrok();
                 }}
-            >Stop</Button>
+            >Stop</UI.Button>
 
-            <Button
+            <UI.Button
                 disabled={(ngrokStatus !== 'error') || waitingForNewStatus}
                 variant="outlined"
                 color="warning"
@@ -101,17 +97,17 @@ const NgrokSettings = () => {
                     setWaitingForNewStatus(true);
                     window.ipc.startNgrok();
                 }}
-            >Retry</Button>
-        </Stack>
+            >Retry</UI.Button>
+        </UI.Stack>
 
-        {ngrokStatus === 'open' && ngrokURL && <FormHelperText>
+        {ngrokStatus === 'open' && ngrokURL && <UI.MUI.HelperText>
             Available at <a target="blank" href={ngrokURL}>{ngrokURL}</a>
-        </FormHelperText>}
+        </UI.MUI.HelperText>}
 
         {ngrokStatus === 'error' && <>
-            <FormHelperText sx={{ color: 'var(--c-error)'}}>
+            <UI.MUI.HelperText sx={{ color: 'var(--c-error)'}}>
                 There was an error connecting to Ngrok
-            </FormHelperText>
+            </UI.MUI.HelperText>
 
             {ngrokError && <pre style={{ color: 'var(--c-error)' }}>{ngrokError}</pre>}
         </>}

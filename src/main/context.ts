@@ -46,8 +46,8 @@ const context = {
         ngrok: null
     }) as unknown as ControlMe.Errors,
 
-    server: null as ControlMe.ServerResponse|null,
-    ngrok: null as ControlMe.NgrokResponse|null
+    server: null as ControlMe.Server|null,
+    ngrok: null as ControlMe.Ngrok|null
 }
 
 export default context;

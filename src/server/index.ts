@@ -36,5 +36,5 @@ export default function startServer(port?: number) {
                 io
             });
         });
-    });
+    }).catch(err => String(err?.message || err));
 }

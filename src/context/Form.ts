@@ -3,7 +3,7 @@ import { createContext, useContext } from 'react';
 interface FormCTX<T = RSAny> {
     id: string;
     state: State<T>;
-    errors?: Record<string, string|null|false>;
+    errors?: Record<string, string>;
     onFieldChange(k: string, v: any): void;
 }
 

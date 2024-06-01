@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import TabForm from './TabForm';
-import Field from '@components/Field';
+import UI from '@components/ui';
 
 const WebcamSettings = () => {
     const [webcams, setWebcams] = useState<{ id: string; label: string }[]>([]);
@@ -15,7 +15,7 @@ const WebcamSettings = () => {
     }, [webcams]);
 
     return <TabForm id="settings-webcam" name="webcam">
-        <Field
+        <UI.Field
             name="device"
             type="select"
             label="Device"

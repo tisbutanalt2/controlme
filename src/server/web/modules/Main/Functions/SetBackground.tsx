@@ -6,11 +6,9 @@ import { useSocket } from '@context/Socket';
 import { FunctionDef } from '.';
 
 import axios from 'axios';
-import Button from '@muim/Button';
+import UI from '@components/ui';
 
 import Prompt from '@components/Prompt';
-import Field from '@components/Field';
-import Stack from '@muim/Stack';
 import pickRandom from '@utils/array/pickRandom';
 
 const SetBackground = () => {
@@ -75,8 +73,8 @@ const SetBackground = () => {
             ]}
             validate={() => src? true: { src: 'Required' }}
         >
-            <Stack direction="row" alignItems="center" gap="8px">
-                <Field
+            <UI.Stack>
+                <UI.Field
                     name="src"
                     type="select"
                     options={fileList.map(src => ({
@@ -85,17 +83,17 @@ const SetBackground = () => {
                     }))}
                     label="Source image"
                     value={src}
-                    onChange={(k, v) => setSrc(v)}
+                    onChange={v => setSrc(v)}
                     sx={{ width: '200px' }}
                 />
 
-                <Button variant="outlined" onClick={() => {
+                <UI.Button variant="outlined" onClick={() => {
                     setSrc(!fileList.length? '': pickRandom(fileList))
-                }}>Random</Button>
-            </Stack>
+                }}>Random</UI.Button>
+            </UI.Stack>
 
             <div>
-                <Button onClick={fetchFiles}>Refresh files</Button>
+                <UI.Button onClick={fetchFiles}>Refresh files</UI.Button>
                 {src && <>
                     <p>Preview</p>
                     <br />

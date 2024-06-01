@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 
 import FormContext from '@context/Form';
-import Field, { FieldProps } from './Field';
+import Field from '@appui/Field';
 
 import Button, { ButtonProps } from '@muim/Button';
 
@@ -28,7 +28,7 @@ export type PromptBaseProps = {
     }[];
 
     formId?: string;
-    fields?: FieldProps[];
+    fields?: UI.FieldProps[];
     fieldErrors?: Record<string, string>;
 
     content?: JSX.Element;

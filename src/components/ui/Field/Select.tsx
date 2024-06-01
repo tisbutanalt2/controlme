@@ -3,7 +3,7 @@ import { useForm } from '@context/Form';
 import FieldBase from './Base';
 import MUI from '@appui/mui';
 
-const TextField: FC<UI.TextFieldProps & UI.FieldBaseProps> = props => {
+const Select: FC<UI.SelectFieldProps & UI.FieldBaseProps> = props => {
     const { state: [form] } = useForm();
     const isError = !!props.error;
 
@@ -13,16 +13,18 @@ const TextField: FC<UI.TextFieldProps & UI.FieldBaseProps> = props => {
                 {props.label}
             </MUI.Label>}
 
-            <MUI.OutlinedInput
-                id={props.id}
+            <MUI.Select
+                labelId={props.helperId}
+                value={(props.value ?? form[props.name]) || ''}
                 label={props.label}
-                error={isError}
-                type={props.password? 'password': 'undefined'}
-                value={String((props.value ?? form[props.name]) || '')}
                 placeholder={props.placeholder}
-                aria-describedby={props.helperId}
-                onChange={e => props.onChange?.(e.currentTarget.value || '')}
-            />
+                onChange={e => props.onChange?.(e.target.value || undefined)}
+            >
+                {props.options?.map((option, i) => <MUI.MenuItem
+                    key={i}
+                    value={option.value}
+                >{option.label}</MUI.MenuItem>)}
+            </MUI.Select>
         </MUI.FormControl>
 
         {props.helperId && <MUI.HelperText
@@ -34,4 +36,4 @@ const TextField: FC<UI.TextFieldProps & UI.FieldBaseProps> = props => {
     </FieldBase>
 }
 
-export default TextField;
+export default Select;

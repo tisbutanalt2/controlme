@@ -3,9 +3,16 @@ import { useForm } from '@context/Form';
 import FieldBase from './Base';
 import MUI from '@appui/mui';
 
-const TextField: FC<UI.TextFieldProps & UI.FieldBaseProps> = props => {
+const NumberField: FC<UI.NumberFieldProps & UI.FieldBaseProps> = props => {
     const { state: [form] } = useForm();
     const isError = !!props.error;
+
+    const parsedValue = Number(props.value ?? form[props.name]);
+    const value = String(
+        Number.isFinite(parsedValue)
+            ? parsedValue
+            : (props.defaultValueWhenEmpty ?? '')
+    );
 
     return <FieldBase {...props} className="form-field-text">
         <MUI.FormControl disabled={props.disabled} sx={props.sx}>
@@ -17,11 +24,24 @@ const TextField: FC<UI.TextFieldProps & UI.FieldBaseProps> = props => {
                 id={props.id}
                 label={props.label}
                 error={isError}
-                type={props.password? 'password': 'undefined'}
-                value={String((props.value ?? form[props.name]) || '')}
+                inputProps={{
+                    type: 'number',
+                    min: props.min,
+                    max: props.max
+                }}
+                value={value}
                 placeholder={props.placeholder}
                 aria-describedby={props.helperId}
-                onChange={e => props.onChange?.(e.currentTarget.value || '')}
+                onChange={e => {
+                    if (!props.onChange) return;
+                    const newValue = Number(e.currentTarget.value);
+
+                    props.onChange(
+                        Number.isFinite(newValue)
+                            ?newValue
+                            :undefined
+                    );
+                }}
             />
         </MUI.FormControl>
 
@@ -34,4 +54,4 @@ const TextField: FC<UI.TextFieldProps & UI.FieldBaseProps> = props => {
     </FieldBase>
 }
 
-export default TextField;
+export default NumberField;

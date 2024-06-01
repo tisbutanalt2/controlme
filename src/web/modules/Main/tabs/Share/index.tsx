@@ -1,12 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNgrokURL } from '@context/Ngrok';
 
-import Form from '@components/Form';
-import Field from '@components/Field';
-
-import Button from '@muim/Button';
-import Stack from '@muim/Stack';
-import FormHelperText from '@muim/FormHelperText';
+import UI from '@components/ui';
 
 const Share = () => {
     const [mounted, setMounted] = useState<boolean>(false);
@@ -27,23 +22,23 @@ const Share = () => {
         if (mounted) return;
         setMounted(true);
 
-        window.ipc.on('shareLink.added', (link: Auth.ShareLink) => {
+        window.ipcMain.on('shareLink.added', (link: Auth.ShareLink) => {
             setLinks(prev => [...prev, link]);
         });
 
-        window.ipc.on('shareLink.deleted', (id: string) => {
+        window.ipcMain.on('shareLink.deleted', (id: string) => {
             setNewest(prev => prev === id? null: prev);
             setLinks(prev => prev.filter(l => l.id !== id));
         });
 
-        window.ipc.onConfigValueChange('server.address', (newAddress: string) => {
+        window.ipcMain.onConfigValueChange('server.address', (newAddress: string) => {
             setFallback(newAddress);
         });
 
-        window.ipc.getConfigValue('server.address')
+        window.ipcMain.getConfigValue('server.address')
             .then(setFallback);
 
-        window.ipc.getShareLinks().then(setLinks);
+        window.ipcMain.getShareLinks().then(setLinks);
     }, [mounted]);
 
     const generateLink = useCallback(() => {
@@ -57,20 +52,21 @@ const Share = () => {
     return <div className="tab-generic share-tab">
         <div className="tab-generic-content">
             <h1>Share a link!</h1>
-            <FormHelperText>
+            <UI.MUI.HelperText>
                 To let others access your PC, you need to create a share link.
                 Optionally, you can create overrides for what functions someone
                 can access when they use your link. Otherwise, the access level
                 defaults to the values defined in settings.
-            </FormHelperText>
+            </UI.MUI.HelperText>
 
-            <Form id="sharelink-create" state={[form, setForm]} sx={{ mt: '24px' }}>
-                <Stack
+            <UI.Form id="sharelink-create" state={[form, setForm]}>
+                <UI.Stack
                     direction="column"
                     gap="24px"
                     justifyContent="center"
+                    alignItems="flex-start"
                 >
-                    <Field
+                    <UI.Field
                         name="type"
                         type="select"
                         label="Link type"
@@ -82,7 +78,7 @@ const Share = () => {
                         sx={{ width: '120px', minWidth: '80px' }}
                     />
 
-                    <Field
+                    <UI.Field
                         name="maxUses"
                         type="number"
                         label="maxUses"
@@ -90,56 +86,56 @@ const Share = () => {
                         min={0}
                         sx={{ width: '120px', minWidth: '64px' }}
                     />
-                </Stack>
+                </UI.Stack>
 
-                <Button
+                <UI.Button
                     disabled={generating}
                     onClick={generateLink}
                     color="success"
                     variant="outlined"
                     sx={{ width: 'fit-content', padding: '12px 32px', mt: '24px' }}
-                >Share!</Button>
+                >Share!</UI.Button>
 
-                {newest && <Stack
+                {newest && <UI.Stack
                     direction="column"
                     alignItems="flex-start"
                     mt="24px"
                     gap="12px"
                 >
-                    <FormHelperText>Success! Link generated with ID {newest}</FormHelperText>
-                    <Button color="info" variant="outlined" onClick={() => {
+                    <UI.MUI.HelperText>Success! Link generated with ID {newest}</UI.MUI.HelperText>
+                    <UI.Button color="info" variant="outlined" onClick={() => {
                         window.ipc.writeToClipboard(
                             `${ngrokURL || fallback || '[address missing]'}/?sid=${newest}`
                         );
                         setNewest(null);
-                    }}>Copy to clipboard</Button>    
-                </Stack>}
-            </Form>
+                    }}>Copy to clipboard</UI.Button>    
+                </UI.Stack>}
+            </UI.Form>
 
             <h2>List of active links</h2>
             {Boolean(links.length)? <div>
-                {links.map((l, i) => <Stack
+                {links.map((l, i) => <UI.Stack
                     key={i}
                     direction="row"
                     alignItems="center"
                     gap="12px"
                 >
                     <pre>{l.id}</pre>
-                    <Button
+                    <UI.Button
                         variant="outlined"
                         color="info"
                         onClick={() => window.ipc.writeToClipboard(
                             `${ngrokURL || fallback || '[address missing]'}/?sid=${l.id}`
                         )}
                         sx={{ ml: 'auto' }}
-                    >Copy</Button>
-                    <Button
+                    >Copy</UI.Button>
+                    <UI.Button
                         variant="outlined"
                         color="error"
                         onClick={() => window.ipc.deleteShareLink(l.id)}
-                    >Delete</Button>
-                </Stack>)}
-            </div>: <FormHelperText>No links</FormHelperText>}
+                    >Delete</UI.Button>
+                </UI.Stack>)}
+            </div>: <UI.MUI.HelperText>No links</UI.MUI.HelperText>}
         </div>
     </div>
 }

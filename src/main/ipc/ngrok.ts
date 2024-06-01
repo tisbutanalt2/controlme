@@ -14,9 +14,9 @@ export const startNgrok = async () => {
     const port = context.server.port;
     const res = await connectNgrok(port);
 
-    if (res.error) {
+    if (typeof res !== 'object') {
         context.statuses.ngrok = 'error';
-        context.errors.ngrok = sanitizeError(res.error);
+        context.errors.ngrok = sanitizeError(res);
         
         context.ngrok = null;
         return res;
@@ -29,9 +29,9 @@ export const startNgrok = async () => {
 }
 
 export const stopNgrok = () => {
-    if (context.statuses.ngrok !== 'open' || !context.ngrok?.disconnect) return console.warn('Ngrok was attempted closed when not running');
+    if (context.statuses.ngrok !== 'open' || !context.ngrok) return console.warn('Ngrok was attempted closed when not running');
 
-    context.ngrok.disconnect();
+    context.ngrok.tunnel.close();
 
     context.statuses.ngrok = 'closed';
     context.ngrok = null;

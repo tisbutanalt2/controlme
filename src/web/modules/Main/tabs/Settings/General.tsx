@@ -1,5 +1,5 @@
 import TabForm from './TabForm';
-import Field from '@components/Field';
+import UI from '@components/ui';
 
 import { useIgnoreDangerousState } from '@context/IgnoreDangerous';
 
@@ -7,33 +7,32 @@ const GeneralSettings = () => {
     const [ignoreDangerous, setIgnoreDangerous] = useIgnoreDangerousState();
 
     return <TabForm id="settings-general" name="general">
-        <Field
+        <UI.Field
             name="ignoreDangerous"
             type="switch"
             label="Disable warnings"
             description="Disables dangerous option warnings"
             color="warning"
             value={ignoreDangerous}
-            onChange={(k, v) => setIgnoreDangerous(v)}
+            onChange={v => setIgnoreDangerous(v)}
         />
         
-        <Field
+        <UI.Field
             name="launchOnStartup"
-            type="switch"
+            type="checkbox"
             label="Launch on startup"
             description="Enable to automatically start the app when your computer turns on"
-            dangerous
+            warningLevel="medium"
         />
 
-        <Field
+        <UI.Field
             name="startMinimized"
             type="checkbox"
             label="Start minimized"
             description="Enable to hide the control panel when the app is launched"
-            sx={{ mt: '24px' }}
         />
 
-        <Field
+        <UI.Field
             name="exitOnClose"
             type="checkbox"
             label="Exit on close"

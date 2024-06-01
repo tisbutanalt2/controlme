@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import TabForm from './TabForm';
-import Field from '@components/Field';
-
-import Button from '@muim/Button';
-import Stack from '@muim/Stack';
-import FormHelperText from '@muim/FormHelperText';
+import UI from '@components/ui';
 
 const ServerSettings = () => {
     const [serverStatus, setServerStatus] = useState<ControlMe.ServerStatus>('closed');
@@ -25,25 +21,23 @@ const ServerSettings = () => {
         });
     }, [mounted]);
 
-    console.log(serverStatus);
-
     return <TabForm id="settings-server" name="server">
-        <Field
+        <UI.Field
             name="autoStart"
             type="switch"
             label="Auto start"
             description="Automatically starts the server when the app is launched"
         />
 
-        <Field
+        <UI.Field
             name="notification"
             type="switch"
             label="Notification on server start"
             description="Displays a desktop notification when the server is started"
         />
 
-        <Stack direction="row" columnGap="12px" mt="24px">
-            <Field
+        <UI.Stack direction="row" columnGap="12px" mt="24px">
+            <UI.Field
                 name="port"
                 type="number"
                 label="Port"
@@ -53,30 +47,30 @@ const ServerSettings = () => {
                 max={65535}
             />
 
-            <Button
+            <UI.Button
                 disabled={serverStatus !== 'closed'}
                 variant="outlined"
                 color="success"
                 onClick={window.ipc.startServer}
-            >Start</Button>
+            >Start</UI.Button>
 
-            <Button
+            <UI.Button
                 disabled={serverStatus !== 'open'}
                 variant="outlined"
                 color="error"
                 onClick={window.ipc.stopServer}
-            >Stop</Button>
+            >Stop</UI.Button>
 
-            <Button
+            <UI.Button
                 disabled={serverStatus !== 'open'}
                 variant="outlined"
                 color="warning"
                 onClick={window.ipc.restartServer}
-            >Restart</Button>
-        </Stack>
-        <FormHelperText>Insert 0 if unsure</FormHelperText>
+            >Restart</UI.Button>
+        </UI.Stack>
+        <UI.MUI.HelperText>Insert 0 if unsure</UI.MUI.HelperText>
 
-        <Field
+        <UI.Field
             name="address"
             type="text"
             label="Server address"

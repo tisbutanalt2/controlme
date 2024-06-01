@@ -4,11 +4,10 @@ import { useSettingsContext } from '.';
 import { defaultSettings } from '@utils/constants';
 import controlFunctions, { sortedFunctions } from '@utils/controlFunctions';
 
-import TabForm from './TabForm';
-import Field from '@components/Field';
-import Divider from '@muim/Divider';
+import UI from '@components/ui';
 
-import FormHelperText from '@muim/FormHelperText';
+import TabForm from './TabForm';
+
 
 const FunctionSettings = () => {
     const [all, setAll] = useState<boolean>(false);
@@ -64,18 +63,17 @@ const FunctionSettings = () => {
     );
 
     return <TabForm id="settings-functions" name="functions">
-        <Field
+        <UI.Field
             name="all"
-            type="checkbox"
+            type="switch"
             label="Enable all"
             description="Turns on ALL the functions, use with caution"
             value={all}
-            onChange={(k, v) => {
+            onChange={v => {
                 setAll(v);
                 !v && setSettings(prev => {
                     const functions = { ...prev.functions };
 
-                    console.log(functions);
                     for (const k in functions) {
                         functions[k] = v;
                     }
@@ -86,37 +84,37 @@ const FunctionSettings = () => {
                     });
                 })
             }}
-            veryDangerous
-            dangerousMessage="Are you sure you want to enable ALL functions?"
+            warningLevel="high"
+            warningMessage="Are you sure you want to enable ALL functions?"
         />
 
-        <Divider sx={{ mt: '8px' }} />
+        <UI.MUI.Divider sx={{ mt: '8px' }} />
         <h2 style={{ marginBottom: '0' }}>Safe functions</h2>
-        <FormHelperText>These options are generally safe, but there is no guarantee that you won't run into issues</FormHelperText>
+        <UI.MUI.HelperText>These options are generally safe, but there is no guarantee that you won't run into issues</UI.MUI.HelperText>
 
         {sortedFunctions
             .map((func, i) => <Fragment key={i}>
                 {i === firstDangerous && <>
-                    <Divider sx={{ mt: '8px' }} />
+                    <UI.MUI.Divider sx={{ mt: '8px' }} />
                     <h2 style={{ marginBottom: '0' }}>Potentially dangerous functions</h2>
-                    <FormHelperText>These options are somewhat unsafe, and are turned off by default</FormHelperText>
+                    <UI.MUI.HelperText>These options are somewhat unsafe, and are turned off by default</UI.MUI.HelperText>
                 </>}
 
                 {i === firstVeryDangerous && <>
-                    <Divider sx={{ mt: '8px' }} />
+                    <UI.MUI.Divider sx={{ mt: '8px' }} />
                     <h2 style={{ marginBottom: '0' }}>Very dangerous functions</h2>
-                    <FormHelperText>These options are dangerous, and WILL cause damage to your PC if access is given to the wrong person</FormHelperText>
+                    <UI.MUI.HelperText>These options are dangerous, and WILL cause damage to your PC if access is given to the wrong person</UI.MUI.HelperText>
                 </>}
                 
-                <Field
+                <UI.Field
                     key={i}
                     name={func.name}
-                    type="checkbox"
+                    type="switch"
                     label={func.title}
                     description={func.description}
-                    dangerous={func.dangerous}
-                    veryDangerous={func.veryDangerous}
-                    dangerousMessage={func.dangerousMessage}
+                    // TODO
+                    warningLevel={func.veryDangerous? 'high': (func.dangerous? 'medium': undefined)}
+                    warningMessage={func.dangerousMessage}
                     disabled={func.requires? (
                         typeof func.requires === 'string'? !Boolean(settings.functions[func.requires])
                         :!(func.requires[func.requireAll? 'every':'some']((k: string) => Boolean(settings.functions[k])))

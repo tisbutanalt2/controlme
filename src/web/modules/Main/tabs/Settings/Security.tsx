@@ -1,24 +1,24 @@
 import TabForm from './TabForm';
-import Field from '@components/Field';
+import UI from '@components/ui';
 
 const SecuritySettings = () => {
     return <TabForm id="settings-security" name="security">
-        <Field
+        <UI.Field
             name="disablePanicKeybind"
-            veryDangerous
+            warningLevel="high"
             type="switch"
             label="Disable panic keybind"
             description="Disables the keybind you can use to forcefully quit the app"
-            dangerousMessage="This option disables the ability to close the app in an alternative way (Ctrl+Shift+P). Are you sure you want to turn this keybind off?"
+            warningMessage="This option disables the ability to close the app in an alternative way (Ctrl+Shift+P). Are you sure you want to turn this keybind off?"
         />
 
-        <Field
+        <UI.Field
             name="disableAuth"
-            veryDangerous
+            warningLevel="high"
             type="switch"
             label="Disable authentication"
             description="Disables the need for authentication, granting access to anyone with your server address."
-            dangerousMessage="The security layer prevents unwanted access. Are you sure you want to turn this off?"
+            warningMessage="The security layer prevents unwanted access. Are you sure you want to turn this off?"
         />
     </TabForm>
 }

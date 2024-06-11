@@ -1,6 +1,7 @@
 import { Server } from 'http';
 import { Server as IO } from 'socket.io';
 
+import configStore from '@utils/store/config';
 import context from '@main/context';
 import getFunctionAccess from '@utils/server/getFunctionAccess';
 
@@ -27,11 +28,13 @@ export default function setupSockets(server: Server) {
             // Used by access links
             displayName
         } = socket.handshake.auth as RSAny;
-
+        
         if (!jwt && !sid) return next(new Error('Missing authentication parameters'));
-
+        
         const user = decodeUserToken(jwt);
         const shareLink = !user && sid && authStore.get(`shareLinks.${sid}`) as Auth.ShareLink;
+        
+        socket.data.displayName = user?.displayName || displayName || 'Anonymous';
 
         if (shareLink) {
             const expired = shareLink.expiresAt
@@ -53,11 +56,10 @@ export default function setupSockets(server: Server) {
             ) return next(new Error('This link has already been used the max amount of times'));
         }
 
-        if (!user && !shareLink) return next(new Error('Authentication failed'));
+        if (!user && !shareLink && !configStore.get('security.disableAuth')) return next(new Error('Authentication failed'));
 
         socket.data.user = user;
         socket.data.sid = sid;
-        socket.data.displayName = user?.displayName || displayName || 'Anonymous';
         socket.data.accessOverrides = user?.accessOverrides ?? shareLink?.accessOverrides;
 
         next();

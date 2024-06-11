@@ -11,8 +11,7 @@ const login = (username: string, password: string, user?: Auth.User) => {
     user ??= authStore.get(`users.${username}`);
     if (!user) return false;
 
-    // TODO TEMP
-    const success = password === user.password || bcrypt.compareSync(password, user.password);
+    const success = bcrypt.compareSync(password, user.password);
     if (!success) return false;
 
     const timestamp = Date.now();

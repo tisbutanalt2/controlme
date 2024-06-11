@@ -1,6 +1,9 @@
 import { app, nativeImage } from 'electron';
 import { join, resolve } from 'path';
 
+import configStore from '@utils/store/config';
+import authStore from '@utils/store/auth';
+
 import StatusProxy from './statusProxy';
 import getAssetPath from '@utils/getAssetPath';
 
@@ -47,7 +50,10 @@ const context = {
     }) as unknown as ControlMe.Errors,
 
     server: null as ControlMe.Server|null,
-    ngrok: null as ControlMe.Ngrok|null
+    ngrok: null as ControlMe.Ngrok|null,
+
+    configStore,
+    authStore
 }
 
 export default context;

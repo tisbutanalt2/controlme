@@ -10,10 +10,13 @@ A fun app made with Electron to let others control your PC.
 4. Copy the authtoken using the blue "Copy" button
 5. Navigate to Settings>Ngrok in the app
 6. Paste your Ngrok authtoken into the "Auth token" field
-7. Start the Ngrok tunnel
-8. Navigate to the "Share" tab
-9. Create a share link for your friends!
-10. Have fun!
+7. Navigate to the [Domains](https://dashboard.ngrok.com/cloud-edge/domains) menu in the Ngrok dashboard
+8. Click "Create Domain"
+9. Copy the ****.ngrok-free.app address and paste it into the "Domain" field in the app
+10. Start the Ngrok tunnel
+11. Navigate to the "Share" tab
+12. Create a share link for your friends!
+13. Have fun!
 
 ## Troubleshooting
 - Errors with Ngrok usually mean that you have another instance of the app running

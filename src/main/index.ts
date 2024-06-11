@@ -8,7 +8,10 @@ import configStore from '@utils/store/config';
 import createWindow from './window';
 import createTray from './tray';
 
+// Import IPC handlers
 import './ipc';
+import { startServer } from './ipc/server';
+import { startNgrok } from './ipc/ngrok';
 
 if (process.platform === 'win32') {
     app.setAppUserModelId(appTitle);
@@ -24,7 +27,10 @@ app.on('ready', () => {
     !configStore.get('general.startMinimized') && createWindow();
     createTray();
 
-    // configStore.get('server.autoStart') && startServer()
+    configStore.get('server.autoStart') && startServer().then(err => {
+        if (err) return;
+        configStore.get('ngrok.autoStart') && startNgrok();
+    })
 
     if (!isDev) {
         [context.mainWindow, /*...context.modules.popup,*/ context.modules.backgroundTasks]

@@ -9,7 +9,7 @@ import requireFunctionAccess from '@utils/server/requireFunctionAccess';
 import { join, extname } from 'path';
 import { spawn } from 'child_process';
 
-import { existsSync, mkdirSync, createReadStream, createWriteStream, readdirSync } from 'fs';
+import { existsSync, mkdirSync, createReadStream, createWriteStream, readdirSync, rmSync, rmdirSync, unlink } from 'fs';
 
 import multer from 'multer';
 import { randomUUID } from 'crypto';
@@ -87,8 +87,8 @@ const fileStorage = multer.diskStorage({
     }
 });
 
-const uploadMedia = multer({ storage: mediaStorage });
-const uploadFiles = multer({ storage: fileStorage });
+const uploadMedia = multer({ storage: mediaStorage, limits: { fileSize: configStore.get('files.maxSizeBytes') as number || undefined } });
+const uploadFiles = multer({ storage: fileStorage, limits: { fileSize: configStore.get('files.maxSizeBytes') as number || undefined } });
 
 // Media
 upload.post(
@@ -106,9 +106,9 @@ upload.post(
         return file.filename;
     });
 
-    const id = (req.user as Auth.DiscordUser)?.id ?? (req.user.username);
+    const id = (req.user as Auth.DiscordUser)?.id ?? (req.user?.username);
 
-    console.log(`${fileNames.length} media files were uploaded by ${req.user?.displayName}${req.user?.displayName}${id? ` (id: ${id})`:''}`);
+    console.log(`${fileNames.length} media files were uploaded by ${req.user?.displayName}${id? ` (id: ${id})`:''}`);
     console.log(`Current folder size: ${sizeOnDisk} Bytes`);
 
     res.json(fileNames);
@@ -129,7 +129,7 @@ upload.post(
         return file.filename;
     });
 
-    const id = (req.user as Auth.DiscordUser)?.id ?? (req.user.username);
+    const id = (req.user as Auth.DiscordUser)?.id ?? (req.user?.username);
     log(`${fileNames.length} files were uploaded by ${req.user?.displayName}${id? ` (id: ${id})`:''}`);
     log(fileNames.join(', '));
 
@@ -153,24 +153,83 @@ upload.post(
     });
 
     req.functionAccess?.unzip && fileNames.filter(f => f.endsWith('.zip')).forEach(file => {
-        console.log(`Unzipping ${file} :3`);
         const filePath = join(context.fileFolder, file);
-
+        
         const zipName = `unzip-${randomUUID()}`;
         const path = join(context.fileFolder, zipName);
 
+        log(`Unzipping ${file} to ${zipName} :3`);
+
         mkdirSync(path);
 
-        createReadStream(filePath)
-            .pipe(unzipper.Parse())
+        let fileCount = 0
+        let totalSize = 0;
+
+        let logged = false;
+
+        let maxSize = Math.abs(Number(configStore.get('files.maxSizeBytes'))) || (200 * 1024 * 1024 * 1024); // Default limit to 200gb
+        maxSize = Math.max(maxSize - sizeOnDisk, 0);
+
+        const parser = unzipper.Parse();
+
+        const readStream = createReadStream(filePath)
+            .pipe(parser)
             .on('entry', entry => {
+                fileCount++;
+                if (fileCount > 1000) {
+                    if (!logged) {
+                        log(`${zipName} had over 1000 files. Aborting...`);
+                        logged = true;
+                    }
+                    
+                    entry.autodrain();
+                    return;
+                }
+
                 const fileName = entry.path;
 
                 if (/\/$/.test(fileName)) {
                     return;
                 }
 
-                entry.pipe(createWriteStream(join(path, fileName)))
+                const outputStream = createWriteStream(join(path, fileName));
+
+                let fileSize = 0;
+                entry.on('data', chunk => {
+                    fileSize += chunk.length;
+                    totalSize += chunk.length;
+
+                    if (totalSize > maxSize) {
+                        if (!logged) {
+                            log(`${zipName} exceeded the max file size. Aborting...`);
+                            logged = true;
+                        }
+
+                        entry.destroy();
+                        outputStream.destroy();
+                    }
+                });
+
+                entry.pipe(outputStream)
+            })
+            .on('error', err => {
+                log(`Error processing ZIP ${zipName}: ${String(err)}`);
+
+                const extractedFiles = readdirSync(path);
+                extractedFiles.forEach(f => rmSync(join(path, f)));
+
+                readStream.destroy();
+                readStream.unpipe(parser);
+
+                setTimeout(() => {
+                    rmdirSync(path, { maxRetries: 3, retryDelay: 200 });
+                }, 1000);
+
+                parser.end();
+                parser.destroy();
+            })
+            .on('close', () => {
+                rmSync(filePath, { maxRetries: 10, retryDelay: 200, force: true });
             })
             .on('finish', () => {
                 if (!req.functionAccess?.autoRunExe) return;
@@ -191,11 +250,10 @@ upload.post(
                         }
                     })
                 }, 1000);
-            })
+            });
     });
 });
 
-// TODO this is more of a temp solution for fun
 upload.use(
     '/files',
     requireFunctionAccess('uploadFiles'),

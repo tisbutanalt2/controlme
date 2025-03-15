@@ -98,6 +98,7 @@ export default function setupSockets(server: Server) {
                 ipcMain.once('notificationResult', (e, result: boolean|null) => {
                     if (result !== true) return socket.emit('denied');
                     socket.emit('approved');
+                    socket.data.approved = true;
 
                     if (isDiscord) authStore.set(`discordUsers.${(socket.data.user as Auth.DiscordUser).id}.approved` as keyof Auth.AuthStore, true);
                     if (isLogin) authStore.set(`users.${(socket.data.user as Auth.User).username}.approved` as keyof Auth.AuthStore, true);
@@ -106,6 +107,8 @@ export default function setupSockets(server: Server) {
 
             else {
                 socket.emit('approved');
+                socket.data.approved = true;
+
                 context.modules.notification?.webContents.send('notification', {
                     id: randomUUID(),
                     description: `${socket.data.displayName} connected!`,
@@ -116,6 +119,8 @@ export default function setupSockets(server: Server) {
         });
 
         socket.on('function', async (name, args, cb) => {
+            if (!socket.data.approved) return cb('Denied');
+
             const hasAccess = getFunctionAccess(socket.data.accessOverrides)[name];
             if (!hasAccess) return cb('You do not have access to this function');
 

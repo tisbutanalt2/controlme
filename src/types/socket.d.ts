@@ -23,6 +23,7 @@ declare global {
                 sid?: string;
                 displayName: string;
                 accessOverrides?: Auth.AccessOverrides;
+                approved?: boolean;
             }
             
             type Server = import('socket.io').Server<ServerEvents, ClientEvents, InternalEvents, Data>;

@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { Server, createServer } from 'http';
+import { createServer } from 'http';
 import { AddressInfo } from 'net';
 
 import setupSockets from './socket';

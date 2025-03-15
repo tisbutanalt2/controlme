@@ -1,10 +1,11 @@
-import { BrowserWindow } from 'electron';
-import context from '@main/context';
+import { BrowserWindow, app, shell } from 'electron';
+import configStore from '@utils/store/config';
 
+import context from '@main/context';
 import { appTitle } from '@utils/constants';
 
-export default function createWindow() {
-    if (context.mainWindow)
+export default function createWindow(show: boolean = true) {
+    if (context.mainWindow && show)
         return context.mainWindow.show();
 
     const win = context.mainWindow = new BrowserWindow({
@@ -31,6 +32,24 @@ export default function createWindow() {
         query: { module: 'main' }
     });
 
-    win.on('ready-to-show', win.show);
+    win.on('close', e => {
+        if (configStore.get('general.exitOnClose')) {
+            app.quit();
+        }
+
+        else {
+            e.preventDefault();
+            win.hide();
+        }
+    });
+
+    win.webContents.setWindowOpenHandler(details => {
+        shell.openExternal(details.url);
+        return {
+            action: 'deny'
+        };
+    })
+
+    win.on('ready-to-show', () => show && win.show());
     return win;
 }

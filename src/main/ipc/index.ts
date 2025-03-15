@@ -5,6 +5,8 @@ import './config';
 import './server';
 import './ngrok';
 import './share';
+import './popup';
+import './notification';
 
 ipcMain.handle('version', () => context.version);
 ipcMain.on('error', (e, err: any) => {
@@ -12,6 +14,6 @@ ipcMain.on('error', (e, err: any) => {
     console.error(err);
 });
 
-ipcMain.on('writeToClipboard', (a, str: string) => {
+ipcMain.on('writeToClipboard', (e, str: string) => {
     clipboard.writeText(str);
 })

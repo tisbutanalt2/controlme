@@ -6,10 +6,12 @@ declare global {
 
             interface ServerEvents {
                 function: (name: string & keyof ControlMe.Functions, args: any[], cb?: Callback) => void;
+                requestApproval: () => void;
             }
 
             interface ClientEvents {
-
+                approved: () => void;
+                denied: () => void;
             }
 
             interface InternalEvents {
@@ -17,7 +19,7 @@ declare global {
             }
 
             interface Data {
-                user?: Auth.User;
+                user?: Auth.User|Auth.DiscordUser;
                 sid?: string;
                 displayName: string;
                 accessOverrides?: Auth.AccessOverrides;

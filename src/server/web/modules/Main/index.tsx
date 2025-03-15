@@ -14,13 +14,16 @@ import SetBackground from './Functions/SetBackground';
 import Screenshot from './Functions/Screenshot';
 import Webcam from './Functions/Webcam';
 import ImagePopup from './Functions/ImagePopup';
+import RunCommand from './Functions/RunCommand';
 
 const Main = () => {
     const [socket, setSocket] = useState<Socket|null>(null);
+    const [denied, setDenied] = useState<boolean>(false);
     const accessSetup = useAccessSetup();
     
     const sid = accessSetup?.shareLink?.id;
     const jwt = accessSetup?.jwt;
+    const discordJwt = accessSetup?.discordJwt;
 
     useEffect(() => {
         if (socket || (!sid && !jwt)) return;
@@ -29,6 +32,7 @@ const Main = () => {
             path: '/socket',
             auth: {
                 jwt,
+                discordJwt,
                 sid,
                 displayName: accessSetup?.displayName
             },
@@ -38,13 +42,24 @@ const Main = () => {
 
         const interval = setInterval(() => {
             if (sock.id) {
-                setSocket(sock);
+                sock.once('approved', () => {
+                    setSocket(sock);                    
+                });
+
+                sock.once('denied', () => {
+                    setDenied(true)
+                    sock.close();
+                });
+
+                sock.emit('requestApproval');
                 clearInterval(interval);
             }
         }, 200);
-    }, [socket, sid, jwt]);
+    }, [socket, sid, jwt, discordJwt]);
 
     if (!accessSetup.functions) return null;
+    if (denied) return <h2>You were denied access</h2>
+    if (!socket) return <h2>Awaiting approval...</h2>
     
     return <SocketContext.Provider value={[socket, setSocket]}>
         <h2>Functions</h2>
@@ -57,6 +72,7 @@ const Main = () => {
             <SetBackground />
             <Screenshot />
             <Webcam />
+            <RunCommand />
         </Functions>
     </SocketContext.Provider>
 }

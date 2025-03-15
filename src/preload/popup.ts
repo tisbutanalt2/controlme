@@ -11,9 +11,6 @@ const context = {
 declare global {
     interface Window {
         ipcPopup: typeof context;
-
-        // TEMP FOR BYPASS
-        popupIpc: typeof context;
     }
 }
 

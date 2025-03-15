@@ -46,6 +46,17 @@ declare global {
 
                 /** DANGEROUS: Disabled the need for authentication */
                 disableAuth: boolean;
+
+                /** Third party authentication server */
+                authServer?: string;
+
+                /** Require manual approval to allow user to connect */
+                approveAuth?: boolean;
+
+                /** Always manually approve requests, even if the user was approved previously */
+                alwaysApprove?: boolean;
+
+                disableFutureRequests?: boolean;
             };
 
             server: {

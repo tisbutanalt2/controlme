@@ -28,7 +28,7 @@ export default async function connectNgrok(port: number): Promise<ControlMe.Ngro
             disconnect: () => disconnect(url)
         }*/
     } catch(err) {
-        console.error('Failed to connect to ngrok');
+        console.error('Failed to connect to Ngrok');
         console.error(err);
 
         return String(err);

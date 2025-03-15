@@ -8,6 +8,7 @@ A fun app made with Electron to let others control your PC in various (mostly) s
 
 Features are marked with a checkbox which determines whether it has been implemented or not:
 
+- [x] Discord authentication (requires third party server)
 - [x] Change wallpaper
 - [x] Image popups
 - [ ] Video popups*
@@ -18,7 +19,7 @@ Features are marked with a checkbox which determines whether it has been impleme
 - [x] Take screenshots
 - [x] Upload files and media
 - [x] Autorun executable files
-- [ ] Run terminal commands 
+- [x] Run terminal commands 
 
 ## Installation
 The app is shipped with an installer. Download it and run it.
@@ -76,3 +77,12 @@ npm run node:watch
 npm run node:start
 npm run node:build
 ```
+
+### 4. Discord authentication
+If you wish to enable discord authentication, you will need to set up or use a third party authentication server.
+See [Control Me Auth](https://github.com/tisbutanalt2/controlme-auth) if you wish to set up your own auth server.
+
+**Steps to set up Discord authentication:**
+1. Get the URL to a Control Me authentication server (must be a trusted source)
+2. Paste the server URL in Settings > Security > Authentication server
+3. Go to share, and select the link type "Discord" to copy a link

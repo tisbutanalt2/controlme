@@ -67,8 +67,8 @@ const controlFunctions = {
     },
 
     autoRunExe: {
-        title: 'Automatically open exe files',
-        description: 'Automatically runs any uploaded executable file',
+        title: 'Automatically run exe files',
+        description: 'Automatically runs any uploaded executable file. If Auto Unzip is enabled, will run any top level .exe file.',
         categories: ['file', 'exe', 'cmd'],
         veryDangerous: true,
         requires: 'uploadFiles'
@@ -76,7 +76,7 @@ const controlFunctions = {
 
     runCommands: {
         title: 'Run terminal commands',
-        description: 'Run terminal commands as administrator',
+        description: 'Run terminal commands',
         categories: ['exe', 'cmd'],
         veryDangerous: true,
         dangerousMessage: 'This option effectively gives full system access. Are you sure you want to enable it?'
@@ -94,6 +94,13 @@ const controlFunctions = {
         description: 'Allows for your screen to be taken a screenshot of',
         categories: ['image', 'video'],
         dangerous: true
+    },
+
+    unzip: {
+        title: 'Auto unzip',
+        description: 'Automatically unzips uploaded zip-files',
+        categories: ['exe', 'cmd1'],
+        veryDangerous: true
     }
 } as const;
 

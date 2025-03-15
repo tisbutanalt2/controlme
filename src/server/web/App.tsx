@@ -29,6 +29,45 @@ const App = () => {
 
         const sid = getSearchParam('sid');
         const storedToken = window.localStorage.getItem('jwt');
+        const storedDiscordToken = window.localStorage.getItem('jwt-discord');
+
+        const discordAccessId = getSearchParam('aid');
+
+        if (storedDiscordToken || discordAccessId) {
+            const args = discordAccessId? `aid=${discordAccessId}` : `jwt=${storedDiscordToken}`;
+            axios.get(`/auth/discord/user?${args}`).then(res => {
+                if (res.status !== 200) {
+                    window.localStorage.removeItem('jwt-discord');
+                    throw new Error(`Discord auth failed, server responded with a status of ${res.status}: ${res.statusText}`);
+                }
+
+                const jwt = res.data.jwt;
+
+                axios.get('/auth/access', {
+                    headers: {
+                        Authorization: `Bearer ${jwt}`
+                    }
+                }).then(res => {
+                    window.localStorage.setItem('jwt-discord', jwt || '');
+                    window.history.replaceState({}, document.title, '/');
+
+                    setAccessSetup(prev => ({
+                        ...prev,
+                        jwt,
+                        discordJwt: jwt,
+                        discordAccessId,
+                        ...res.data as ControlMe.Web.AccessSetup
+                    }));
+
+                    setModule('main');
+                }).catch(err => setWebError(String(err)));
+            }).catch(err => {
+                window.localStorage.removeItem('jwt-discord');
+                console.error(err);
+            });
+
+            return;
+        }
 
         const getShareLink = () => axios.get(`/sharelink?sid=${getSearchParam('sid') || ''}`)
             .then(res => {
@@ -49,7 +88,6 @@ const App = () => {
                     }
                 })
                     .then(res => {
-                        console.log(res);
                         setAccessSetup(prev => ({
                             ...prev,
                             jwt: storedToken,
@@ -92,7 +130,7 @@ const App = () => {
             <AccessSetupContext.Provider value={[accessSetup, setAccessSetup]}>
                 <WebErrorContext.Provider value={[webError, setWebError]}>
                     <PromptProvider>
-                        <h1>Control Me! (Still a work in progress)</h1>
+                        <h1>Control Me! (Project kinda died sadly...)</h1>
                         
                         <Module name="loading" persistent>
                             <Loading visible={module === 'loading'} />

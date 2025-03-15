@@ -1,4 +1,6 @@
-const FieldBase: FCC<UI.FieldBaseProps> = props => <div className="form-field">
+import combineClasses from '@utils/string/combineClasses';
+
+const FieldBase: FCC<UI.FieldBaseProps> = props => <div className={combineClasses('form-field', props.className)}>
     {props.children}
 </div>
 

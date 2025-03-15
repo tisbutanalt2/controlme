@@ -35,8 +35,8 @@ export default function createPopupWindows() {
         });
 
         win.setAlwaysOnTop(true, 'screen-saver');
-        
         win.setIgnoreMouseEvents(true, { forward: true });
+        
         await win.loadFile(context.webPath, {
             query: { module: 'popup' }
         });
@@ -49,5 +49,8 @@ export default function createPopupWindows() {
             const index = context.modules.popup.indexOf(win);
             index >= 0 && context.modules.popup.splice(index, 1);
         });
+
+        win.show();
+        win.blur();
     });
 }

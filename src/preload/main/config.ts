@@ -5,6 +5,8 @@ const configFunctions = {
     setConfigValue: (k: string, v: any) => ipcRenderer.invoke('config.set', k, v),
 
     getConfig: () => ipcRenderer.invoke('config.get') as Promise<ControlMe.Settings>,
+    purgeUsers: () => ipcRenderer.send('purgeUsers'),
+    deleteUsers: () => ipcRenderer.send('deleteUsers'),
 
     onConfigValueChange: <T = any>(k: string, cb: Listener) => {
         ipcRenderer.send('config.subscribeToChange', k);
@@ -15,7 +17,9 @@ const configFunctions = {
 
         ipcRenderer.on('config.valueChange', listener);
         return () => ipcRenderer.off('config.valueChange', listener);
-    }
+    },
+
+    openFileFolder: () => ipcRenderer.send('openFileFolder')
 };
 
 export default configFunctions;

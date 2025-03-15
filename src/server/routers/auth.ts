@@ -1,9 +1,16 @@
 import { Router } from 'express';
+import { randomUUID } from 'crypto';
 
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+import context from '@main/context';
+
 import authStore, { secret } from '@utils/store/auth';
+import configStore from '@utils/store/config';
+
+import axios from 'axios';
+
 import requireLoggedIn from '@utils/server/requireLoggedIn';
 import getFunctionAccess from '@utils/server/getFunctionAccess';
 
@@ -131,6 +138,117 @@ auth.get('/auth/access', requireLoggedIn(), (req, res) => {
 auth.delete('/auth/delete', requireLoggedIn(), (req, res) => {
     authStore.delete(`users.${req.user.username}` as keyof Auth.AuthStore);
     res.status(200).send('Ok');
+});
+
+// Discord Auth 🗣
+const getTpAuthServer = () => configStore.get('security.authServer') as string|undefined;
+
+const authIds = new Set<string>();
+const userIdMap = new Map<string, { id: string, ts: number }>();
+
+// Client should be sent to this endpoint
+auth.get('/auth/discord', (req, res) => {
+    const tpAuthServer = getTpAuthServer();
+    if (!tpAuthServer) return res.status(400).send('No auth server available');
+
+    const id = randomUUID();
+    authIds.add(id);
+
+    setTimeout(() => {
+        authIds.delete(id);
+    }, 60_000);
+
+    const token = jwt.sign(id, secret);
+
+    const appAddress = context.ngrok?.url ?? configStore.get('server.address');
+    if (!appAddress) return res.status(500).send('App address missing');
+    
+    const url = new URL(tpAuthServer + '/auth/discord');
+    url.searchParams.set('aid', token);
+    url.searchParams.set('addr', appAddress);
+
+    res.redirect(url.href);
+});
+
+// Endpoint to call from third party server
+auth.post('/auth/callback/discord', async (req, res) => {
+    const tpAuthServer = getTpAuthServer();
+    if (!tpAuthServer) return res.status(400).send('No auth server available');
+
+    // Check if the aid exists
+    if (!req.query.aid) return res.status(400).send('Missing auth id in [aid]');
+    if (!req.query.uid) return res.status(400).send('Missing user id in [uid]');
+
+    let authId: string;
+    try {
+        authId = jwt.verify(req.query.aid as string, secret) as string;
+    } catch {
+        return res.status(400).send('Invalid auth id');
+    }
+
+    if (!authId || !authIds.has(authId)) return res.status(400).send('Invalid auth id');
+
+    const userId = req.query.uid as string;
+    try {
+        const userRes = await axios.get(`${tpAuthServer}/user/discord?uid=${userId}`);
+        const user = userRes.data as Auth.DiscordUser;
+
+        authStore.set(`discordUsers.${user.id}`, {
+            ...user
+        } as Auth.DiscordUser);
+
+        userIdMap.set(authId, { id: user.id, ts: user.lastLogin! });
+        authIds.delete(authId);
+
+        res.status(200).send('Ok');
+    } catch(err) {
+        console.error('Failed to fetch Discord user data');
+        console.error(err);
+
+        return res.status(500).send('Failed to fetch user data');
+    }
+});
+
+auth.get('/auth/discord/user', (req, res) => {
+    let authId = req.query.aid as string;
+    let token = req.query.jwt as string;
+
+    let user: Auth.DiscordJWT|undefined;
+
+    if (authId) {
+        try {
+            authId = jwt.verify(authId, secret) as string;
+        } catch {
+            return res.status(400).send('Invalid auth id');
+        }
+
+        const mappedUser = userIdMap.get(authId);
+        if (!mappedUser) return res.status(400).send('Invalid auth id');
+
+        userIdMap.delete(authId);
+        user = { userId: mappedUser.id, timestamp: mappedUser.ts };
+        token = jwt.sign(user, secret);
+    }
+
+    else if (token) {
+        try {
+            user = jwt.verify(token, secret) as Auth.DiscordJWT;
+        } catch {
+            return res.status(400).send('Invalid jwt');
+        }
+    }
+
+    else return res.status(400).send('Missing auth id in [aid] or access token in [jwt]');
+
+    const storedUser = authStore.get(`discordUsers.${user!.userId}`) as Auth.DiscordUser|undefined;
+    if (!storedUser) return res.status(404).send('User not found');
+
+    if (storedUser.lastLogout && (storedUser.lastLogout > user.timestamp)) return res.status(400).send('Expired');
+
+    res.json({
+        user: storedUser,
+        jwt: token
+    });
 });
 
 export default auth;

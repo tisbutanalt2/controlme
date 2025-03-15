@@ -2,6 +2,7 @@ import { useState, useEffect, createContext, useContext, Fragment } from 'react'
 import { PopupPropsBase } from './Base';
 
 import ImagePopup, { ImagePopupProps } from './ImagePopup';
+import useTransparentPassthrough from '@hooks/useTransparentPassthrough';
 
 type PopupProps = PopupPropsBase & (
     { type: 'image' } & ImagePopupProps|
@@ -14,26 +15,13 @@ const Popup = () => {
     const [mounted, setMounted] = useState<boolean>(false);
     const [popups, setPopups] = useState<PopupProps[]>([]);
 
-    // Logic for deciding whether or not the mouse should be picked up by the popup module
+    useTransparentPassthrough(window.ipcPopup.focus, window.ipcPopup.blur);
+
     useEffect(() => {
         if (mounted) return;
         setMounted(true);
 
-        window.addEventListener('mousemove', e => {
-            const target = document.elementFromPoint(e.clientX, e.clientY);
-            const element = (
-                (target !== document.body) &&
-                (target?.id !== 'root') &&
-                target?.getAttribute('data-hover') !== null
-            )? target: null;
-
-            if (element)
-                window.popupIpc.focus();
-            else
-                window.popupIpc.blur();
-        });
-
-        window.popupIpc.on('popup', (props: PopupProps) => {
+        window.ipcPopup.on('popup', (props: PopupProps) => {
             setPopups(prev => [...prev, props]);
         });
     }, [mounted]);

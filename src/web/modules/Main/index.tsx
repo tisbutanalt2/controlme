@@ -7,7 +7,7 @@ import Tab from '@components/Tab';
 import Share from './tabs/Share';
 import Settings from './tabs/Settings';
 
-const Main = () => {
+const Main: FC = () => {
 
     return <Providers>
         <Tabs searchParam="tab">

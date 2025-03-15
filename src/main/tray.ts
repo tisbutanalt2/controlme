@@ -21,6 +21,11 @@ export default function createTray() {
             })
         },
 
+        {
+            label: 'Refresh notification window',
+            click: () => context.modules.notification?.webContents.reload()
+        },
+
         { type: 'separator' },
 
         {
@@ -42,7 +47,17 @@ export default function createTray() {
 
                 {
                     label: 'Open devtools (popups)',
-                    click: () => context.modules.popup.forEach(win => win.webContents.openDevTools())
+                    click: () => context.modules.popup.forEach(win => {
+                        win.webContents.openDevTools();
+                        win.setIgnoreMouseEvents(false);
+
+                        const listener = () => {
+                            win.setIgnoreMouseEvents(true, { forward: true });
+                            win.webContents.off('devtools-closed', listener);
+                        }
+                        
+                        win.webContents.on('devtools-closed', listener);
+                    })
                 }
             ]
         }
@@ -56,11 +71,27 @@ export default function createTray() {
     tray.setToolTip(appTitle);
     tray.setContextMenu(menu);
 
+    const menuFocus = () => {
+        context.modules.notification?.setIgnoreMouseEvents(true, { forward: false });
+        context.modules.popup.forEach(win => win.setIgnoreMouseEvents(true, { forward: false }));
+    }
+
+    const menuBlur = () => {
+        context.modules.notification?.setIgnoreMouseEvents(true, { forward: true });
+        context.modules.popup.forEach(win => win.setIgnoreMouseEvents(true, { forward: true }));
+    }
+
     // Open main window on click
-    tray.on('click', () => context.mainWindow
-        ?context.mainWindow.show()
-        :createWindow()
-    );
+    tray.on('click', () => {
+        context.mainWindow
+            ?context.mainWindow.show()
+            :createWindow()
+
+            menuBlur();
+    });
+
+    menu.on('menu-will-show', menuFocus);
+    menu.on('menu-will-close', menuBlur);
 
     return tray;
 }

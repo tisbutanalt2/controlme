@@ -7,6 +7,7 @@ declare global {
 
         interface User {
             username: string;
+            approved?: boolean;
 
             /** Hashed with bcrypt */
             password: string;
@@ -34,7 +35,7 @@ declare global {
             expiresAt?: string;
     
             /** Whether it's an access link or a signup link */
-            type: 'access'|'signup';
+            type: 'access'|'signup'|'discord';
 
             /** Optional access overrides */
             accessOverrides?: AccessOverrides;
@@ -49,10 +50,34 @@ declare global {
             timestamp: number;
         }
 
+        interface DiscordJWT {
+            userId: string;
+            timestamp: number;
+        }
+
         interface AuthStore {
             secret?: string;
             shareLinks?: Record<string, ShareLink>;
+
             users?: Record<string, User>;
+            discordUsers?: Record<string, DiscordUser>;
+        }
+
+        interface DiscordUser {
+            approved?: boolean;
+
+            id: string;
+            username: string;
+
+            displayName: string;
+            avatar: string;
+
+            /** Used for JWT validation */
+            lastLogin?: number;
+            lastLogout?: number;
+
+            /** Optional access overrides */
+            accessOverrides?: AccessOverrides;
         }
     }
 }

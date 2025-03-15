@@ -27,7 +27,7 @@ export const FunctionDef: FC<FunctionFieldProps & PromptBaseProps> = ({ name, bu
     if (!accessSetup?.functions?.[name] || !definition || !socket) return null;
 
     return <div className="function-def">
-        <div className="function-description">{children || name}</div>
+        <div className="function-description">{children || props.title || name}</div>
         {button || <Button sx={{ ml: 'auto', width: 'fit-content', minWidth: '100px', padding: '8px 16px' }} variant="outlined" color="success" onClick={onClick ?? (() => {
             promptCaller({
                 title: props.title ?? definition.title,

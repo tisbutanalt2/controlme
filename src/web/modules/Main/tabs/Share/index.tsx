@@ -73,28 +73,38 @@ const Share = () => {
                         description="Signup links allow for the receiver to create a user in your app, while access links provide direct access!"
                         options={[
                             { label: 'Access', value: 'access' },
-                            { label: 'Signup', value: 'signup' }
+                            { label: 'Signup', value: 'signup' },
+                            { label: 'Discord', value: 'discord' }
                         ]}
                         sx={{ width: '120px', minWidth: '80px' }}
                     />
 
-                    <UI.Field
+                    {form.type !== 'discord' && <UI.Field
                         name="maxUses"
                         type="number"
-                        label="maxUses"
-                        description="Max amount of times the link can be uset. Set to 0 for unlimited uses."
+                        label="Max uses"
+                        description="Max amount of times the link can be used. Set to 0 for unlimited uses."
                         min={0}
                         sx={{ width: '120px', minWidth: '64px' }}
-                    />
+                    />}
                 </UI.Stack>
 
-                <UI.Button
+                {form.type !== 'discord' && <UI.Button
                     disabled={generating}
                     onClick={generateLink}
                     color="success"
                     variant="outlined"
                     sx={{ width: 'fit-content', padding: '12px 32px', mt: '24px' }}
-                >Share!</UI.Button>
+                >Share!</UI.Button>}
+
+                {form.type === 'discord' && <UI.Button
+                    color="success"
+                    variant="outlined"
+                    sx={{ width: 'fit-content', padding: '12px 32px', mt: '24px' }}
+                    onClick={async () => {
+                        window.ipcMain.writeToClipboard(`${(ngrokURL || fallback)?.replace(/\/$/, '')}/auth/discord`);
+                    }}
+                >Copy link</UI.Button>}
 
                 {newest && <UI.Stack
                     direction="column"

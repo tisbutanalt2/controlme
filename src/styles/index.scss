@@ -23,8 +23,13 @@ body {
 		margin: 32px 48px;
 	}
 
-	&.module-popup {
+	&.module-popup, &.module-notification {
 		background-color: transparent;
+		user-select: none;
+	}
+
+	&.module-notification {
+		overflow: hidden;
 	}
 }
 
@@ -71,5 +76,13 @@ code, pre {
 }
 
 .form-field {
-	margin-top: 24px;
+	margin-top: 4px;
+
+	&.form-field-text {
+		margin-top: 16px;
+	}
+
+	p.MuiFormHelperText-root {
+		margin-top: 2px;
+	}
 }

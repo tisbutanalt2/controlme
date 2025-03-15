@@ -1,4 +1,5 @@
 import { shell } from 'electron';
+import { spawn } from 'child_process';
 
 import setBackground from './setBackground';
 import screenshot from './screenshot';
@@ -13,7 +14,12 @@ const functions: { [K in keyof Partial<ControlMe.Functions>]: (...args: any[]) =
         shell.openExternal(url);
     }),
     accessCamera: webcamImage,
-    imagePopups: imagePopup
+    imagePopups: imagePopup,
+    runCommands: (cmd: string) => {
+        const sub = spawn(cmd, { shell: true });
+        sub.stdout.pipe(process.stdout);
+        sub.stderr.pipe(process.stderr);
+    }
 };
 
 export default functions;

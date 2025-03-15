@@ -1,7 +1,7 @@
 import Store from 'electron-store';
 import { randomBytes } from 'crypto';
 
-const authStore = new Store<Auth.AuthStore>({ name: 'auth', defaults: {}});
+const authStore = new Store<Auth.AuthStore>({ name: 'auth' });
 
 export let secret = authStore.get('secret');
 if (!secret) {

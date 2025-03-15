@@ -29,11 +29,11 @@ const FileSettings = () => {
 
     // TODO renovation
     return <>
-        {/*<UI.Button
+        {<UI.Button
             variant="outlined"
             onClick={window.ipcMain.openFileFolder}
             sx={{ mb: '24px' }}
->Open uploaded files</UI.Button>*/}
+>Open uploaded files</UI.Button>}
         
         <TabForm id="settings-functions" name="files">
             <UI.Stack>

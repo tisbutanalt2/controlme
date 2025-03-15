@@ -30,7 +30,6 @@ const SetBackground = () => {
                 sid
             }
         }).then(res => {
-            console.log(res.data);
             setFileList(res.data);
         });
     }, [sid, jwt]);

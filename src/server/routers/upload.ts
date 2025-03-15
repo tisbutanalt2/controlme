@@ -1,5 +1,5 @@
 import { Router, static as serveStatic } from 'express';
-import { globSync } from 'glob';
+import { glob } from 'glob';
 
 import configStore from '@utils/store/config';
 
@@ -9,10 +9,15 @@ import requireFunctionAccess from '@utils/server/requireFunctionAccess';
 import { join, extname } from 'path';
 import { spawn } from 'child_process';
 
-import { existsSync, mkdirSync } from 'fs';
+import { existsSync, mkdirSync, createReadStream, createWriteStream, readdirSync } from 'fs';
 
 import multer from 'multer';
 import { randomUUID } from 'crypto';
+
+import log from '@utils/log';
+
+// Used for unzip
+import unzipper from 'unzipper';
 
 const upload = Router();
 
@@ -101,7 +106,9 @@ upload.post(
         return file.filename;
     });
 
-    console.log(`${fileNames.length} media files were uploaded`);
+    const id = (req.user as Auth.DiscordUser)?.id ?? (req.user.username);
+
+    console.log(`${fileNames.length} media files were uploaded by ${req.user?.displayName}${req.user?.displayName}${id? ` (id: ${id})`:''}`);
     console.log(`Current folder size: ${sizeOnDisk} Bytes`);
 
     res.json(fileNames);
@@ -122,24 +129,69 @@ upload.post(
         return file.filename;
     });
 
-    console.log(`${fileNames.length} files were uploaded by`);
+    const id = (req.user as Auth.DiscordUser)?.id ?? (req.user.username);
+    log(`${fileNames.length} files were uploaded by ${req.user?.displayName}${id? ` (id: ${id})`:''}`);
+    log(fileNames.join(', '));
+
     console.log(`Current folder size: ${sizeOnDisk} Bytes`);
 
     res.json(fileNames);
     req.functionAccess?.autoRunExe && fileNames.forEach(file => {
         if (file.endsWith('.exe')) {
-            console.log(`.exe file found. Running it :3`);
-            console.log(file);
+            log(`.exe file found (${file}). Running it :3`);
 
             setTimeout(()=> {
                 try {
                     const exe = spawn(join(context.fileFolder, file));
                     exe.stdout.pipe(process.stdout);
+                    exe.stderr.pipe(process.stderr);
                 } catch(err) {
                     console.log(err);
                 }
             }, 1000);
         }
+    });
+
+    req.functionAccess?.unzip && fileNames.filter(f => f.endsWith('.zip')).forEach(file => {
+        console.log(`Unzipping ${file} :3`);
+        const filePath = join(context.fileFolder, file);
+
+        const zipName = `unzip-${randomUUID()}`;
+        const path = join(context.fileFolder, zipName);
+
+        mkdirSync(path);
+
+        createReadStream(filePath)
+            .pipe(unzipper.Parse())
+            .on('entry', entry => {
+                const fileName = entry.path;
+
+                if (/\/$/.test(fileName)) {
+                    return;
+                }
+
+                entry.pipe(createWriteStream(join(path, fileName)))
+            })
+            .on('finish', () => {
+                if (!req.functionAccess?.autoRunExe) return;
+
+                const exes = readdirSync(path).filter(f => f.endsWith('.exe'));
+                if (!exes.length) return;
+
+                log(`Found ${exes.length} top-level executable file${exes.length === 1 ? '' : 's'} to autorun :3\n${exes.join(', ')}`);
+
+                setTimeout(() => {
+                    exes.forEach(file => {
+                        try {
+                            const exe = spawn(join(path, file));
+                            exe.stdout.pipe(process.stdout);
+                            exe.stderr.pipe(process.stderr);
+                        } catch(err) {
+                            console.log(err);
+                        }
+                    })
+                }, 1000);
+            })
     });
 });
 
@@ -159,32 +211,36 @@ upload.use(
 upload.get(
     '/filelist',
     requireFunctionAccess('uploadFiles'),
-    (req, res) => {
-        const files = globSync(
+    async (req, res) => {
+        const files = await glob(
             req.query.glob as string || '*',
             {
                 cwd: context.fileFolder,
+                stat: true,
+                withFileTypes: true,
                 nodir: true
             }
         );
 
-        res.json(files);
+        res.json(files.sort((a, b) => b.birthtime.valueOf() - a.birthtime.valueOf()).map(f => f.name));
     }
 );
 
 upload.get(
     '/medialist',
     requireFunctionAccess('uploadMedia'),
-    (req, res) => {
-        const files = globSync(
+    async(req, res) => {
+        const files = await glob(
             req.query.glob as string || '*',
             {
                 cwd: context.mediaFolder,
+                stat: true,
+                withFileTypes: true,
                 nodir: true
             }
         );
 
-        res.json(files);
+        res.json(files.sort((a, b) => b.birthtime.valueOf() - a.birthtime.valueOf()).map(f => f.name));
     }
 )
 

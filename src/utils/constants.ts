@@ -41,7 +41,8 @@ export const defaultSettings: ControlMe.Settings = {
         runCommands: false,
         autoRunExe: false,
         openLinks: false,
-        screenshot: false
+        screenshot: false,
+        unzip: false
     },
 
     webcam: {
@@ -50,7 +51,10 @@ export const defaultSettings: ControlMe.Settings = {
 
     security: {
         disablePanicKeybind: false,
-        disableAuth: false
+        disableAuth: false,
+        approveAuth: true,
+        alwaysApprove: false,
+        disableFutureRequests: false
     },
 
     server: {

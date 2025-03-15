@@ -7,9 +7,14 @@ import authStore from '@utils/store/auth';
 import StatusProxy from './statusProxy';
 import getAssetPath from '@utils/getAssetPath';
 
-const appPath = resolve(app.getAppPath(), '..');
+const appPath = process.env.NODE_ENV === 'development'
+    ? resolve(app.getAppPath(), '..')
+    : join(app.getAppPath(), 'app');
 
-const appIconPath = getAssetPath('icon.png');
+const appIconPath = process.env.NODE_ENV === 'development'
+    ? getAssetPath('icon.png')
+    : resolve(app.getAppPath(), '..', 'assets', 'icon.png');
+
 const preloadPath = join(appPath, 'preload');
 
 const userDataPath = app.getPath('userData');
@@ -20,13 +25,15 @@ const context = {
     mainWindow: null as Electron.BrowserWindow|null,
     modules: {
         popup: [] as Electron.BrowserWindow[],
+        notification: null as Electron.BrowserWindow|null,
         backgroundTasks: null as Electron.BrowserWindow|null
     },
 
     webPath: join(appPath, 'web', 'index.html'),
     preloadPaths: {
         main: join(preloadPath, 'main', 'index.js'),
-        popup: join(preloadPath, 'popup.js')
+        popup: join(preloadPath, 'popup.js'),
+        notification: join(preloadPath, 'notification.js')
     },
 
     userDataPath,

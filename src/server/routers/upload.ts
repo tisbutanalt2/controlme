@@ -135,7 +135,9 @@ async (req, res) => {
 
     if (badFilesDetected) return res.status(400).send('One or more files were marked as malicious');
 
-    console.log(`${fileNames.length} media files were uploaded by ${req.user?.displayName}${id? ` (id: ${id})`:''}`);
+    log(`${fileNames.length} media files were uploaded by ${req.user?.displayName}${id? ` (id: ${id})`:''}`);
+    log(fileNames.join(', '));
+    
     console.log(`Current folder size: ${sizeOnDisk} Bytes`);
 
     res.json(fileNames);

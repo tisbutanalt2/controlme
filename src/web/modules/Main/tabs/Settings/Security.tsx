@@ -29,6 +29,16 @@ const SecuritySettings = () => {
         />
 
         <UI.Field
+            name="checkForBadHashes"
+            type="switch"
+            warningLevel="high"
+            warningOnFalse
+            label="Check for malicious uploads (recommended)"
+            description="If enabled will compare uploaded files hashes to a list of known bad hashes. Will also use the third party server in the future."
+            warningMessage="It is highly recommended to keep this on. Are you sure you want to continue?"
+        />
+
+        <UI.Field
             name="approveAuth"
             warningLevel="medium"
             warningOnFalse

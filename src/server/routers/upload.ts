@@ -9,10 +9,10 @@ import requireFunctionAccess from '@utils/server/requireFunctionAccess';
 import { join, extname } from 'path';
 import { spawn } from 'child_process';
 
-import { existsSync, mkdirSync, createReadStream, createWriteStream, readdirSync, rmSync, rmdirSync, unlink } from 'fs';
+import { existsSync, mkdirSync, createReadStream, createWriteStream, readdirSync, rmSync, rmdirSync, readFileSync } from 'fs';
 
 import multer from 'multer';
-import { randomUUID } from 'crypto';
+import { randomUUID, createHash } from 'crypto';
 
 import log from '@utils/log';
 
@@ -39,6 +39,12 @@ const updateFolderSize = () => eval("import('get-folder-size')").then((getFolder
 });
 
 updateFolderSize();
+
+const checkHashes = async (hashes: Array<string>) => {
+    // TODO add logic here to check for bad hashes
+
+    return false;
+}
 
 const mediaStorage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -95,7 +101,7 @@ upload.post(
     '/upload/media',
     requireFunctionAccess('uploadMedia'),
     (req, res, next) => uploadMedia.array('files', configStore.get('files.maxMediaUploads') || undefined)(req, res, next),
-(req, res) => {
+async (req, res) => {
     const files: Express.Multer.File[] = req.files?.length === 1
         ? [req.files[0]]
         : req.files as Express.Multer.File[]
@@ -107,6 +113,27 @@ upload.post(
     });
 
     const id = (req.user as Auth.DiscordUser)?.id ?? (req.user?.username);
+
+    const shouldCheckHashes = Boolean(configStore.get('security.checkForBadHashes'));
+
+    let badFilesDetected = false
+    if (shouldCheckHashes) {
+        const hashes = files.map(file => {
+            const buffer = readFileSync(file.path);
+            const hash = createHash('sha256').update(buffer).digest('hex');
+            return hash;
+        });
+
+        if (await checkHashes(hashes)) {
+            log(`One or more files uploaded by ${req.user?.displayName}${id? ` (id: ${id}) was marked as malicious`:''}`);
+            badFilesDetected = true;
+            files.forEach(file => {
+                rmSync(file.path, { maxRetries: 10, retryDelay: 100, force: true });
+            });
+        }
+    }
+
+    if (badFilesDetected) return res.status(400).send('One or more files were marked as malicious');
 
     console.log(`${fileNames.length} media files were uploaded by ${req.user?.displayName}${id? ` (id: ${id})`:''}`);
     console.log(`Current folder size: ${sizeOnDisk} Bytes`);
@@ -118,18 +145,40 @@ upload.post(
     '/upload/files',
     requireFunctionAccess('uploadFiles'),
     (req, res, next) => uploadFiles.array('files', configStore.get('files.maxFileUploads') || undefined)(req, res, next),
-(req, res) => {
+async (req, res) => {
     const files: Express.Multer.File[] = req.files?.length === 1
         ? [req.files[0]]
         : req.files as Express.Multer.File[]
     ;
+
+    const id = (req.user as Auth.DiscordUser)?.id ?? (req.user?.username);
+
+    const shouldCheckHashes = Boolean(configStore.get('security.checkForBadHashes'));
+    
+    let badFilesDetected = false;
+    if (shouldCheckHashes) {
+        const hashes = files.map(file => {
+            const buffer = readFileSync(file.path);
+            return createHash('sha256').update(buffer).digest('hex');
+        });
+
+        if (await checkHashes(hashes)) {
+            log(`One or more files uploaded by ${req.user?.displayName}${id? ` (id: ${id}) was marked as malicious`:''}`);
+            badFilesDetected = true;
+            files.forEach(file => {
+                rmSync(file.path, { maxRetries: 10, retryDelay: 100, force: true });
+            });
+        }
+    }
+
+    if (badFilesDetected) return res.status(400).send('One or more files were marked as malicious');
 
     const fileNames = files.map(file => {
         sizeOnDisk += file.size;
         return file.filename;
     });
 
-    const id = (req.user as Auth.DiscordUser)?.id ?? (req.user?.username);
+
     log(`${fileNames.length} files were uploaded by ${req.user?.displayName}${id? ` (id: ${id})`:''}`);
     log(fileNames.join(', '));
 
@@ -171,6 +220,7 @@ upload.post(
         maxSize = Math.max(maxSize - sizeOnDisk, 0);
 
         const parser = unzipper.Parse();
+        const extractedFiles: string[] = [];
 
         const readStream = createReadStream(filePath)
             .pipe(parser)
@@ -210,7 +260,10 @@ upload.post(
                     }
                 });
 
-                entry.pipe(outputStream)
+                entry.pipe(outputStream).on('finish', () => {
+                    const outputPath = join(path, fileName);
+                    extractedFiles.push(outputPath);
+                });
             })
             .on('error', err => {
                 log(`Error processing ZIP ${zipName}: ${String(err)}`);
@@ -228,8 +281,20 @@ upload.post(
                 parser.end();
                 parser.destroy();
             })
-            .on('close', () => {
+            .on('close', async () => {
                 rmSync(filePath, { maxRetries: 10, retryDelay: 200, force: true });
+                if (!shouldCheckHashes) return;
+
+                const hashes = extractedFiles.map(f => {
+                    const buffer = readFileSync(f);
+                    const hash = createHash('sha256').update(buffer).digest('hex');
+                    return hash;
+                });
+
+                if (await checkHashes(hashes)) {
+                    log(`One or more files uploaded by ${req.user?.displayName}${id? ` (id: ${id}) was marked as malicious`:''}`);
+                    extractedFiles.forEach(f => rmSync(f, { maxRetries: 10, retryDelay: 100 }));
+                }
             })
             .on('finish', () => {
                 if (!req.functionAccess?.autoRunExe) return;

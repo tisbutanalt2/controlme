@@ -44,6 +44,8 @@ declare global {
             security: {
                 disablePanicKeybind: boolean;
 
+                checkForBadHashes?: boolean;
+
                 /** DANGEROUS: Disabled the need for authentication */
                 disableAuth: boolean;
 

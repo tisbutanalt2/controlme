@@ -51,6 +51,7 @@ export const defaultSettings: ControlMe.Settings = {
 
     security: {
         disablePanicKeybind: false,
+        checkForBadHashes: true,
         disableAuth: false,
         approveAuth: true,
         alwaysApprove: false,

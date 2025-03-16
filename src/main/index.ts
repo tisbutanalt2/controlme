@@ -1,88 +1,39 @@
-import { app, globalShortcut, dialog } from 'electron';
+import { app, dialog } from 'electron';
+import { existsSync, mkdirSync } from 'fs';
 
-// Disable hardware acceleration
-/*app.disableHardwareAcceleration();
-app.commandLine.appendSwitch('no-sandbox');
-app.commandLine.appendSwitch('disable-gpu');
-app.commandLine.appendSwitch('disable-software-rasterizer');
-app.commandLine.appendSwitch('disable-gpu-compositing');
-app.commandLine.appendSwitch('disable-gpu-rasterization');
-app.commandLine.appendSwitch('disable-gpu-sandbox');*/
+import context from 'ctx';
+import configStore from '@stores/config';
 
-import AutoLaunch from 'auto-launch';
+import { startServer } from '@ipc/server';
+import log from 'log';
 
-import context from '@main/context';
-import { appTitle, isDev } from '@utils/constants';
-
-import configStore from '@utils/store/config';
-
-import createWindow from './window';
-import createTray from './tray';
-import createPopupWindows from './popupWindows';
-import createNotificationWindow from './notificationWindow';
-
-// Import IPC handlers
-import './ipc';
-import { startServer } from './ipc/server';
-import { startNgrok } from './ipc/ngrok';
-
-if (process.platform === 'win32') {
-    app.setAppUserModelId(appTitle);
-    //autoUpdater.checkForUpdatesAndNotify()
-}
+import createMainWindow from './mainWindow';
 
 if (!app.requestSingleInstanceLock()) {
-    dialog.showErrorBox('Already running', `${appTitle} is already running. Please close the app before launching it again.`);
+    dialog.showErrorBox('Already running', 'The app is already running. Please close the app before launching it again.');
     app.quit();
 }
 
-const autoLauncher = new AutoLaunch({
-    name: 'controlme',
-    path: app.getPath('exe'),
-    isHidden: true
-});
+// Create folders if they don't exist
+if (!existsSync(context.fileFolder)) mkdirSync(context.fileFolder);
+if (!existsSync(context.mediaFolder)) mkdirSync(context.mediaFolder);
+if (!existsSync(context.logFolder)) mkdirSync(context.logFolder);
+if (!existsSync(context.tempFolder)) mkdirSync(context.tempFolder);
 
-app.on('ready', () => {
-    createPopupWindows();
-    createNotificationWindow();
-    createTray();
-    
-    createWindow(!configStore.get('general.startMinimized'));
+app.on('ready', async () => {
+    createMainWindow(!configStore.get('general.startMinimized'));
 
-    configStore.get('server.autoStart') && startServer().then(err => {
-        if (err) return;
-        configStore.get('ngrok.autoStart') && startNgrok();
-    });
+    if (configStore.get('server.autoStart')) {
+        let port = configStore.get('server.port') as number|undefined;
+        if (typeof port !== 'number' || port < 0) port = 0;
 
-    const autoStart = Boolean(configStore.get('general.launchOnStartup'));
-    autoLauncher.isEnabled().then(v => {
-        if (v && !autoStart) return autoLauncher.disable();
-        if (!v && autoStart) return autoLauncher.enable();
-    });
+        const serverErr = await startServer(port);
+        if (!serverErr) {
+            log(`Server listening on port ${context.server.port}`);
 
-    if (!isDev) {
-        [context.mainWindow, /*...context.modules.popup,*/ context.modules.backgroundTasks]
-            .filter(win => win !== null)
-            .forEach(win => {
-                win.on('focus', () => {
-                    globalShortcut.register('CommandOrControl+R', () => {});
-                });
-        
-                win.on('blur', () => {
-                    globalShortcut.unregister('CommandOrControl+R');
-                });
-            })
+            if (configStore.get('ngrok.autoStart')) {
+                // Start ngrok automatically
+            }
+        }
     }
-
-    !configStore.get('security.disablePanicKeybind') && globalShortcut.register('CommandOrControl+P', app.quit);
-
-    // Add panic keybind
-    configStore.onDidChange('security.disablePanicKeybind' as keyof ControlMe.Settings, (newValue) => {
-        const disabled = newValue as unknown as boolean;
-        if (disabled) globalShortcut.unregister('CommandOrControl+P');
-
-        else globalShortcut.register('CommandOrControl+P', app.quit);
-    })
-
-    console.log(`Running app version ${app.getVersion()}`);
 });

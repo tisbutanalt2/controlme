@@ -1,24 +1,18 @@
 declare global {
-    type RSAny = Record<string, any>;
+    type RSAny = Record<string, unknown>;
 
-    /** Filter an object on the given condition */
+    /** Filter an object's keys by value type */
     type Constrain<T extends RSAny, C> = Pick<T,
         {[K in keyof T]: T[K] extends C? K: never}[keyof T]
     >;
 
-    type Listener = (...args: any[]) => void;
+    type Listener = (...args: unknown[]) => void;
 
     /** CommonJS Module */
     type CJS<T> = { default: T };
 
     /** React state */
     type State<T> = [T, React.Dispatch<React.SetStateAction<T>>];
-
-    /** React.FC */
-    type FC<Props = {}> = React.FC<React.PropsWithChildren<Props>>;
-    type FCC<Props = {}> = FC<Props & { className?: string }>;
-
-    type ColorMode = 'light'|'dark';
 }
 
-export {}
+export {};

@@ -1,85 +1,63 @@
 declare global {
     namespace Auth {
-        interface AccessOverrides {
-            functions?: Partial<ControlMe.Settings['functions']>;
-            files?: Partial<ControlMe.Settings['files']>;
-        }
+        type User = {
+            type: import('enum').UserType;
+            functionOverrides?: Array<ControlMe.FunctionOverride>;
 
-        interface User {
-            username: string;
-            approved?: boolean;
-
-            /** Hashed with bcrypt */
-            password: string;
-
+            /** The user's displayname in the app */
             displayName: string;
+        } & ({
+                type: import('enum').UserType.Login;
+                username: string;
+                password: string;
+            } | {
+                type: import('enum').UserType.Discord;
+                userId: string;
+                username: string;
+                avatar: string;
+            } | {
+                type: import('enum').UserType.Access;
+            }
+        ) & ({
+            type: import('enum').UserType.Login|import('enum').UserType.Discord;
+            _key: string;
 
             /** Used for JWT validation */
             lastLogin?: number;
             lastLogout?: number;
+        } | {
+            type: import('enum').UserType.Access;
+        })
 
-            /** Optional access overrides */
-            accessOverrides?: AccessOverrides;
+        interface Store {
+            secret: string;
+
+            users: Record<string, User>;
+            shareLinks: Record<string, ShareLink>;
         }
 
-        type ReducedUser = Pick<User, 'username'|'displayName'>;
+        type JWT = {
+            /** JWT type */
+            t: import('enum').UserType;
 
-        interface ShareLink {
+            /** Issued at timestamp (unix) */
+            iat: number;
+
+            /** Expires at (unix) */
+            exp: number;
+        } & ({
+            t: import('enum').UserType.Login;
+            usr: string;
+        } | {
+            t: import('enum').UserType.Access;
+
+            /** Display name */
+            dn: string;
+        } | {
+            t: import('enum').UserType.Discord
             id: string;
-
-            /** Max amount of times the link can be used */
-            maxUses?: number;
-            currentUses?: number;
-    
-            /** Expiration timestamp */
-            expiresAt?: string;
-    
-            /** Whether it's an access link or a signup link */
-            type: 'access'|'signup'|'discord';
-
-            /** Optional access overrides */
-            accessOverrides?: AccessOverrides;
-        }
-
-        type ReducedShareLink = Pick<ShareLink, 'id'|'type'> & {
-            functions: ControlMe.Settings['functions'];
-        }
-
-        interface JWT {
-            username: string;
-            timestamp: number;
-        }
-
-        interface DiscordJWT {
-            userId: string;
-            timestamp: number;
-        }
-
-        interface AuthStore {
-            secret?: string;
-            shareLinks?: Record<string, ShareLink>;
-
-            users?: Record<string, User>;
-            discordUsers?: Record<string, DiscordUser>;
-        }
-
-        interface DiscordUser {
-            approved?: boolean;
-
-            id: string;
-            username: string;
-
-            displayName: string;
-            avatar: string;
-
-            /** Used for JWT validation */
-            lastLogin?: number;
-            lastLogout?: number;
-
-            /** Optional access overrides */
-            accessOverrides?: AccessOverrides;
-        }
+        });
     }
 }
 
-export {}
+export {};

@@ -1,8 +1,10 @@
-import { RequestHandler } from 'express';
+import { type RequestHandler } from 'express';
 
-export default function requireFunctionAccess(name: keyof ControlMe.Settings['functions']): RequestHandler {
+export default function requireFunctionAccess(name: string): RequestHandler {
     return (req, res, next) => {
-        if (!req.functionAccess?.[name]) return res.status(400).send('No access');
+        if (!req.functionAccess?.has(name))
+            return res.status(400).send('You do not have access to use this function')
+
         next();
     }
 }

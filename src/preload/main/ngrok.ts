@@ -1,13 +1,13 @@
 import { ipcRenderer } from 'electron';
 
 const ngrokFunctions = {
-    startNgrok: () => ipcRenderer.invoke('startNgrok'),
-    stopNgrok: () => ipcRenderer.invoke('stopNgrok'),
+    startNgrok: () => ipcRenderer.invoke('ngrok.start'),
+    stopNgrok: () => ipcRenderer.invoke('ngrok.stop'),
 
-    ngrokUrl: () => ipcRenderer.invoke('ngrokUrl') as Promise<string|undefined>,
+    ngrokUrl: () => ipcRenderer.invoke('ngrok.url') as Promise<string|undefined>,
     
-    ngrokStatus: () => ipcRenderer.invoke('ngrokStatus') as Promise<ControlMe.NgrokStatus>,
-    ngrokError: () => ipcRenderer.invoke('ngrokError') as Promise<string|null>
+    ngrokStatus: () => ipcRenderer.invoke('ngrok.status') as Promise<ControlMe.Statuses['ngrok']>,
+    ngrokError: () => ipcRenderer.invoke('ngrok.error') as Promise<string|undefined>
 };
 
 export default ngrokFunctions;

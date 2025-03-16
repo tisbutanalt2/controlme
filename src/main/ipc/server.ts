@@ -1,49 +1,53 @@
-import { Notification, ipcMain } from 'electron';
-import { default as startExpress } from '@server/index';
+import { ipcMain, Notification } from 'electron';
 
-import context from '@main/context';
-import configStore from '@utils/store/config';
+import context from 'ctx';
+
+import startExpress from 'server';
+import { ServerStatus } from 'enum';
 
 import sanitizeError from '@utils/sanitizeError';
+import log from 'log';
+import configStore from '@stores/config';
 
-export const startServer = async (port: number = configStore.get('server.port')) => {
-    if (context.statuses.server === 'open') return console.warn('Server was attempted started when already running');
+export const startServer = async (port: number = 3000) => {
+    if (context.statuses.server === ServerStatus.Open) return console.warn('startServer was called when server is already running');
+    if (context.statuses.server === ServerStatus.Starting) return console.warn('startServer was called when server is already starting');
 
-    // Port edge cases
+    context.statuses.server = ServerStatus.Starting;
+
     typeof port !== 'number' && (port = 0);
     port = Math.max(port, 0);
 
-    context.statuses.server = 'starting';
-    
     try {
         if (context.server) {
+            // Start existing server
             context.server.http.listen(port);
-            context.statuses.server = 'open';
+            context.statuses.server = ServerStatus.Open;
             return;
         }
 
+        // Start new server here
         const res = await startExpress(port);
         if (typeof res !== 'object') {
-            context.statuses.server = 'error';
+            context.statuses.server = ServerStatus.Error;
             context.errors.server = sanitizeError(res);
 
             context.server = null;
             return res;
         }
 
-        context.statuses.server = 'open';
+        context.statuses.server = ServerStatus.Open;
         context.server = res;
 
-        configStore.get('server.notification') && new Notification({
+        configStore.get('server.notifyOnStart') && new Notification({
             title: 'Server started',
             icon: context.appIcon,
             body: `Listening on port ${res.port}`
         }).show();
     } catch(err) {
-        console.error('Failed to start server');
-        console.error(err);
+        log(`Failed to start server: ${sanitizeError(err)}`);
 
-        context.statuses.server = 'error';
+        context.statuses.server = ServerStatus.Error;
         context.errors.server = sanitizeError(err);
 
         context.server = null;
@@ -54,26 +58,25 @@ const closeServer = () => {
     if (!context.server) return;
 
     context.server.http.close();
-    context.statuses.server = 'closed';
+    context.statuses.server = ServerStatus.Closed;
 
     context.server = null;
 }
 
 export const stopServer = async () => {
-    if (context.statuses.server !== 'open') return console.warn('Server was attempted closed when not running');
-    if (context.statuses.ngrok !== 'closed') context.ngrok?.tunnel.close();
-
-    context.server.io.close(closeServer);
+    if (context.statuses.server !== ServerStatus.Open) return console.warn('stopServer was called when server is already closed');
+    
+    await context.server.io.close(closeServer);
 
     // Edge case
-    setTimeout(closeServer, 500);
+    setTimeout(closeServer, 1000);
 }
 
-export const restartServer = () => {
-    stopServer();
+export const restartServer = async () => {
+    await stopServer();
     setTimeout(startServer, 1000);
 }
 
-ipcMain.handle('startServer', () => startServer());
-ipcMain.handle('stopServer', () => stopServer());
-ipcMain.handle('restartServer', () => restartServer());
+ipcMain.handle('server.start', () => startServer());
+ipcMain.handle('server.stop', () => stopServer());
+ipcMain.handle('server.restart', () => restartServer());

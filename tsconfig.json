@@ -19,6 +19,13 @@
 
         "baseUrl": ".",
         "paths": {
+            "const": ["src/constants"],
+            "enum": ["src/enum"],
+            "ctx": ["src/main/context"],
+            "log": ["src/log"],
+            "server": ["src/server/index"],
+            "@stores/*": ["src/stores/*"],
+            "@ipc/*": ["src/main/ipc/*"],
             "@clientutils/*": ["src/clientutils/*"],
             "@serverutils/*": ["src/serverutils/*"],
             "@appui/*": ["src/components/ui/*"],

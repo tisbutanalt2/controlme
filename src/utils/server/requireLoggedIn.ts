@@ -1,16 +1,35 @@
 import { RequestHandler } from 'express';
+import configStore from '@stores/config';
+import { UserType } from 'enum';
 
-import decodeUserToken from './decodeUserToken';
+export default function requireLoggedIn(
+    respectDisableAuth: boolean = false,
+    allowedTypes: boolean|UserType|Array<UserType> = [UserType.Login, UserType.Discord]
+): RequestHandler {
+    // If allowedTypes is a boolean, allow all types
+    if (typeof allowedTypes === 'boolean') allowedTypes = [
+        UserType.Login,
+        UserType.Access,
+        UserType.Discord
+    ];
 
-export default function requireLoggedIn(respectDisableAuth: boolean = false): RequestHandler {
+    else if (
+        !(allowedTypes instanceof Array)
+    ) allowedTypes = [allowedTypes];
+
+    const disableAuth = configStore.get('security.disableAuth') as boolean;
+
     return (req, res, next) => {
-        const tokenMatch = req.headers.authorization?.match(/^Bearer (.*)$/i);
-        if (!tokenMatch && !respectDisableAuth) return res.status(403).send('You must be logged in');
+        if (!req.user) {
+            if (respectDisableAuth && disableAuth) return next();
+            return res.status(403).send('You must be logged in to access this resource');
+        }
 
-        const user = decodeUserToken(tokenMatch[1]);
-        if (!user) return res.status(403).send('Invalid JWT');
+        if (!allowedTypes.includes(req.user.type)) {
+            if (respectDisableAuth && disableAuth) return next();
+            return res.status(403).send('You must be logged in to access this resource');
+        }
 
-        req.user = user;
         next();
     }
 }

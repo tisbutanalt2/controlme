@@ -1,32 +1,41 @@
 import { app, nativeImage } from 'electron';
 import { join, resolve } from 'path';
 
-import configStore from '@utils/store/config';
-import authStore from '@utils/store/auth';
+import { isDev } from 'const';
+import { ServerStatus } from 'enum';
+
+import configStore from '@stores/config';
+import authStore from '@stores/auth';
 
 import StatusProxy from './statusProxy';
-import getAssetPath from '@utils/getAssetPath';
 
-const appPath = process.env.NODE_ENV === 'development'
-    ? resolve(app.getAppPath(), '..')
-    : join(app.getAppPath(), 'app');
+const baseAppPath = app.getAppPath();
+const appPath = isDev
+    ? resolve(baseAppPath, '..')
+    : join(baseAppPath, 'app');
 
-const appIconPath = process.env.NODE_ENV === 'development'
-    ? getAssetPath('icon.png')
-    : resolve(app.getAppPath(), '..', 'assets', 'icon.png');
+const appIconPath = isDev
+    ? join('assets', 'icon.png')
+    : resolve(baseAppPath, '..', 'assets', 'icon.png');
 
-const preloadPath = join(appPath, 'preload');
-
+const preloadPath = join(appPath, 'reload');
 const userDataPath = app.getPath('userData');
+
+const initTime = new Date();
+const initTimestamp = initTime.toLocaleString('en-uk')
+    .replace(/^(\d+)\/(\d+)\/(\d+), (\d+:\d+:\d+)$/, '$3-$2-$1 $4')
+    .replace(/:/g, '.');
 
 const context = {
     version: app.getVersion(),
-    
-    mainWindow: null as Electron.BrowserWindow|null,
+    initTime,
+    initTimestamp,
+
+    mainWindow: undefined as Electron.BrowserWindow|undefined,
     modules: {
-        popup: [] as Electron.BrowserWindow[],
-        notification: null as Electron.BrowserWindow|null,
-        backgroundTasks: null as Electron.BrowserWindow|null
+        popup: [] as Array<Electron.BrowserWindow>,
+        notification: undefined as Electron.BrowserWindow|undefined,
+        backgroundTasks: undefined as Electron.BrowserWindow|undefined
     },
 
     webPath: join(appPath, 'web', 'index.html'),
@@ -36,31 +45,35 @@ const context = {
         notification: join(preloadPath, 'notification.js')
     },
 
+    config: configStore,
+    auth: authStore,
+    secret: String(authStore.get('secret')),
+
     userDataPath,
+
     fileFolder: join(userDataPath, 'Files'),
     mediaFolder: join(userDataPath, 'Media'),
+    logFolder: join(userDataPath, 'Logs'),
+    tempFolder: join(userDataPath, 'Temp'),
 
     appIconPath,
     appIcon: nativeImage.createFromPath(appIconPath),
 
-    tray: null as Electron.Tray|null,
-    sockets: [] as ControlMe.Socket[],
+    tray: undefined as Electron.Tray|undefined,
+    sockets: [] as Array<string>,
 
-    statuses: new StatusProxy('Status', {
-        server: 'closed',
-        ngrok: 'closed'
-    }) as unknown as ControlMe.Statuses,
+    statuses: new StatusProxy<ControlMe.Statuses>('status', {
+        server: ServerStatus.Closed,
+        ngrok: ServerStatus.Closed
+    }) as ControlMe.Statuses,
 
-    errors: new StatusProxy('Error', {
-        server: null,
-        ngrok: null
-    }) as unknown as ControlMe.Errors,
+    errors: new StatusProxy<ControlMe.Errors>('errors', {
+        server: undefined,
+        ngrok: undefined
+    }) as ControlMe.Errors,
 
-    server: null as ControlMe.Server|null,
-    ngrok: null as ControlMe.Ngrok|null,
-
-    configStore,
-    authStore
+    server: undefined as ControlMe.Server|undefined,
+    ngrok: undefined //as ControlMe.Ngrok|undefined
 }
 
 export default context;

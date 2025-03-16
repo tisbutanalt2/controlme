@@ -2,253 +2,154 @@ import { Router } from 'express';
 import { randomUUID } from 'crypto';
 
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jsonwebtoken from 'jsonwebtoken';
 
-import context from '@main/context';
-
-import authStore, { secret } from '@utils/store/auth';
-import configStore from '@utils/store/config';
+import context from 'ctx';
+import configStore from '@stores/config';
+import authStore from '@stores/auth';
 
 import axios from 'axios';
 
-import requireLoggedIn from '@utils/server/requireLoggedIn';
+import getShareLink from '@utils/server/getShareLink';
 import getFunctionAccess from '@utils/server/getFunctionAccess';
 
-const login = (username: string, password: string, user?: Auth.User) => {
-    user ??= authStore.get(`users.${username}`);
-    if (!user) return false;
+import requireLoggedIn from '@utils/server/requireLoggedIn';
+
+import { UserType } from 'enum';
+import { maxDisplayNameLength } from 'const';
+
+const expirationTime = 60 * 60 * 24 * 3; // 3 days
+
+const login = (
+    username: string,
+    password: string,
+    user?: Auth.User,
+    returnUser: boolean = false
+) => {
+    user ??= authStore.get(`users.${username}`) as Auth.User;
+    if (!user || user.type !== UserType.Login) return false;
 
     const success = bcrypt.compareSync(password, user.password);
     if (!success) return false;
 
-    const timestamp = Date.now();
+    const timestamp = Math.floor(Date.now() / 1000);
+    user.lastLogin = timestamp;
 
-    authStore.set(`users.${username}`, {
-        ...user,
-        lastLogin: timestamp
-    } as Auth.User);
+    authStore.set(`users.${username}`, user);
 
-    return jwt.sign({
-        username,
-        timestamp
-    } as Auth.JWT, secret);
+    const jwt = jsonwebtoken.sign({
+        t: UserType.Login,
+        usr: username,
+        iat: timestamp,
+        exp: timestamp + expirationTime
+    } as Auth.JWT, context.secret);
+
+    return returnUser ? [jwt, user] : jwt;
 }
 
-const auth = Router();
+const authRouter = Router();
 
-auth.post('/auth/signup', (req, res) => {
-    const id = req.query.sid as string;
-    if (typeof id !== 'string')
-        return res.status(400).send('Missing signup ID');
+authRouter.post('/auth/signup', (req, res) => {
+    const sid = req.query.sid as string|undefined;
+    if (typeof sid !== 'string')
+        throw 'Missing signup ID';
 
-    const shareLink = authStore.get(`shareLinks.${id}`) as Auth.ShareLink;
-    if (shareLink?.type !== 'signup')
-        return res.status(400).send('Invalid link');
-
-    const expired = shareLink.expiresAt
-        ? new Date(shareLink.expiresAt).valueOf() < Date.now()
-        : false;
-
-    if (expired) {
-        authStore.delete(`shareLinks.${id}` as keyof Auth.AuthStore);
-        res.status(400).send('This link has expired');
-    }
-
-    const currentUses = shareLink.currentUses ?? 0;
-    const maxUses = shareLink.maxUses ?? 0;
-
-    if (
-        maxUses !== 0 &&
-        currentUses >= maxUses
-    ) return res.status(400).send('This link has already been used the max amount of times');
-
-    const username = (req.body.username as string)?.toLowerCase?.();
-    const password = req.body.password as string;
+    const username = (req.body.username as string|undefined)?.toLowerCase?.();
+    const password = req.body.password as string|undefined;
 
     if (typeof username !== 'string' || typeof password !== 'string')
-        return res.status(400).send('Missing username and/or password');
+        throw 'Missing username and/or password';
 
     if (authStore.has(`users.${username}`))
-        return res.status(400).send('User already exists');
+        throw 'User already exists';
+
+    const shareLink = getShareLink(sid);
+    if (typeof shareLink === 'string')
+        throw shareLink;
 
     // Username must be minimum 3 chars and only include a-z, 0-9 and underscore
     if (!/^[a-z0-9_]{3,}$/.test(username))
-        return res.status(400).send('Bad username');
+        throw 'Username must be minimum 3 characters long, and must only include alphanumerical characters';
+
+    // Username cannot only contain numbers
+    if (/\d+/.test(username))
+        throw 'Username cannot contain only numbers';
 
     // Password must be >= 5 in length without spaces
     if (!/^[^\s]{5,}$/.test(password))
-        return res.status(400).send('Bad password');
+        throw 'Password must be at least 5 characters, without spaces';
 
     const salt = bcrypt.genSaltSync();
     const hashedPassword = bcrypt.hashSync(password, salt);
 
+    const displayName = String(req.body.displayName);
+    if (displayName.length > maxDisplayNameLength)
+        throw `Display name cannot be longer than ${maxDisplayNameLength} characters`;
+
     const user: Auth.User = {
+        type: UserType.Login,
+        _key: username,
         username,
         password: hashedPassword,
+        displayName: String(req.body.username) || username,
+        functionOverrides: shareLink.functionOverrides
+    };
 
-        displayName: String(req.body.displayName) || username
-    }
+    const jwt = login(username, password, user);
+    if (!jwt) throw 'Failed to log in';
 
-    authStore.set(`users.${username}`, user);
-    authStore.set(`shareLinks.${id}.currentUses`, currentUses + 1);
-
-    res.status(200).json({
-        jwt: login(username, password, user),
-        functions: getFunctionAccess(shareLink.accessOverrides)
+    res.cookie('jwt', jwt, { httpOnly: true });
+    res.json({
+        functionOverrides: getFunctionAccess(user.functionOverrides)
     });
+
+    getShareLink(sid, true);
 });
 
-auth.post('/auth/login', (req, res) => {
-    const username = (req.body.username as string)?.toLowerCase?.();
-    const password = req.body.password as string;
+authRouter.post('/auth/login', (req, res) => {
+    const username = req.body.username as string|undefined;
+    const password = req.body.password as string|undefined;
 
     if (typeof username !== 'string' || typeof password !== 'string')
-        return res.status(400).send('Missing username and/or password');
+        throw 'Missing username and/or password';
 
-    const result = login(username, password);
+    const pair = login(
+        username,
+        password,
+        undefined,
+        true
+    ) as [string, Auth.User]|false;
 
-    result
-        ?res.send(result)
-        :res.status(400).send('Incorrect login');
-});
+    if (!pair) throw 'Incorrect username and/or password';
+    const [jwt, user] = pair;
 
-auth.post('/auth/logout', requireLoggedIn(), (req, res) => {
-    const user = req.user;
-
-    authStore.set(`users.${user.username}`, {
-        ...user,
-        lastLogout: Date.now()
-    } as Auth.User);
-
-    res.status(200).send('Ok');
-});
-
-auth.get('/auth/access', requireLoggedIn(), (req, res) => {
+    res.cookie('jwt', jwt, { httpOnly: true });
     res.json({
-        user: {
-            username: req.user.username,
-            displayName: req.user.displayName
-        },
-
-        displayName: req.user.displayName,
-        functions: getFunctionAccess(req.user.accessOverrides)
-    } as ControlMe.Web.AccessSetup);
-});
-
-auth.delete('/auth/delete', requireLoggedIn(), (req, res) => {
-    authStore.delete(`users.${req.user.username}` as keyof Auth.AuthStore);
-    res.status(200).send('Ok');
-});
-
-// Discord Auth 🗣
-const getTpAuthServer = () => configStore.get('security.authServer') as string|undefined;
-
-const authIds = new Set<string>();
-const userIdMap = new Map<string, { id: string, ts: number }>();
-
-// Client should be sent to this endpoint
-auth.get('/auth/discord', (req, res) => {
-    const tpAuthServer = getTpAuthServer();
-    if (!tpAuthServer) return res.status(400).send('No auth server available');
-
-    const id = randomUUID();
-    authIds.add(id);
-
-    setTimeout(() => {
-        authIds.delete(id);
-    }, 60_000);
-
-    const token = jwt.sign(id, secret);
-
-    const appAddress = context.ngrok?.url ?? configStore.get('server.address');
-    if (!appAddress) return res.status(500).send('App address missing');
-    
-    const url = new URL(tpAuthServer + '/auth/discord');
-    url.searchParams.set('aid', token);
-    url.searchParams.set('addr', appAddress);
-
-    res.redirect(url.href);
-});
-
-// Endpoint to call from third party server
-auth.post('/auth/callback/discord', async (req, res) => {
-    const tpAuthServer = getTpAuthServer();
-    if (!tpAuthServer) return res.status(400).send('No auth server available');
-
-    // Check if the aid exists
-    if (!req.query.aid) return res.status(400).send('Missing auth id in [aid]');
-    if (!req.query.uid) return res.status(400).send('Missing user id in [uid]');
-
-    let authId: string;
-    try {
-        authId = jwt.verify(req.query.aid as string, secret) as string;
-    } catch {
-        return res.status(400).send('Invalid auth id');
-    }
-
-    if (!authId || !authIds.has(authId)) return res.status(400).send('Invalid auth id');
-
-    const userId = req.query.uid as string;
-    try {
-        const userRes = await axios.get(`${tpAuthServer}/user/discord?uid=${userId}`);
-        const user = userRes.data as Auth.DiscordUser;
-
-        authStore.set(`discordUsers.${user.id}`, {
-            ...user
-        } as Auth.DiscordUser);
-
-        userIdMap.set(authId, { id: user.id, ts: user.lastLogin! });
-        authIds.delete(authId);
-
-        res.status(200).send('Ok');
-    } catch(err) {
-        console.error('Failed to fetch Discord user data');
-        console.error(err);
-
-        return res.status(500).send('Failed to fetch user data');
-    }
-});
-
-auth.get('/auth/discord/user', (req, res) => {
-    let authId = req.query.aid as string;
-    let token = req.query.jwt as string;
-
-    let user: Auth.DiscordJWT|undefined;
-
-    if (authId) {
-        try {
-            authId = jwt.verify(authId, secret) as string;
-        } catch {
-            return res.status(400).send('Invalid auth id');
-        }
-
-        const mappedUser = userIdMap.get(authId);
-        if (!mappedUser) return res.status(400).send('Invalid auth id');
-
-        userIdMap.delete(authId);
-        user = { userId: mappedUser.id, timestamp: mappedUser.ts };
-        token = jwt.sign(user, secret);
-    }
-
-    else if (token) {
-        try {
-            user = jwt.verify(token, secret) as Auth.DiscordJWT;
-        } catch {
-            return res.status(400).send('Invalid jwt');
-        }
-    }
-
-    else return res.status(400).send('Missing auth id in [aid] or access token in [jwt]');
-
-    const storedUser = authStore.get(`discordUsers.${user!.userId}`) as Auth.DiscordUser|undefined;
-    if (!storedUser) return res.status(404).send('User not found');
-
-    if (storedUser.lastLogout && (storedUser.lastLogout > user.timestamp)) return res.status(400).send('Expired');
-
-    res.json({
-        user: storedUser,
-        jwt: token
+        functionOverrides: getFunctionAccess(user.functionOverrides)
     });
 });
 
-export default auth;
+authRouter.post('/auth/logout', requireLoggedIn(false, true), (req, res) => {
+    res.clearCookie('jwt', { httpOnly: true });
+
+    if (
+        req.user.type === UserType.Login ||
+        req.user.type === UserType.Discord
+    ) authStore.set(
+        `users.${req.user._key}.lastLogout` as keyof Auth.Store,
+        Math.floor(Date.now() / 1000)
+    );
+
+    res.send('Ok');
+});
+
+authRouter.delete('/auth/delete', requireLoggedIn(false), (req, res) => {
+    const user = req.user as Auth.User & { type: UserType.Login|UserType.Discord };
+
+    authStore.delete(`users.${user._key}` as keyof Auth.Store);
+    res.clearCookie('jwt', { httpOnly: true });
+
+    res.send('Ok');
+});
+
+export default authRouter;

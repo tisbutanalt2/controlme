@@ -13,11 +13,10 @@ declare global {
             disabled?: boolean;
             error?: string;
 
-            value?: any;
-            defaultValue?: any;
+            value?: unknown;
+            defaultValue?: unknown;
 
-            onChange?(value: any): void;
-
+            onChange?(value: unknown): void;
             sx?: import('@muim/styles').SxProps;
         }
 
@@ -68,7 +67,7 @@ declare global {
             ({ type: 'number'|'range' } & NumberFieldProps) |
             ({ type: 'checkbox'|'switch' } & CheckboxFieldProps) |
             ({ type: 'select' } & SelectFieldProps)
-        )
+        );
     }
 }
 

@@ -2,7 +2,7 @@ import { ipcRenderer } from 'electron';
 
 const baseContext = {
     on: (channel: string, cb: Listener) => {
-        const listener = (e: Electron.IpcRendererEvent, ...args: any[]) =>
+        const listener = (_e, ...args: Array<unknown>) =>
             cb(...args);
 
         ipcRenderer.on(channel, listener);
@@ -10,15 +10,15 @@ const baseContext = {
     },
 
     once: (channel: string, cb: Listener) => {
-        ipcRenderer.once(channel, (e, ...args: any[]) =>
+        ipcRenderer.once(channel, (_e, ...args: Array<unknown>) =>
             cb(...args)
         );
     },
 
     version: () => ipcRenderer.invoke('version') as Promise<string>,
-    sendError: (err: any) => ipcRenderer.send('error', err),
+    sendError: (err: unknown) => ipcRenderer.send('error', err),
 
-    writeToClipboard: (str: string) => ipcRenderer.send('writeToClipboard', str)
-}
+    writeToClipboard: (str: string) => ipcRenderer.send('clipboard.write', str)
+};
 
 export default baseContext;

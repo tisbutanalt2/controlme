@@ -1,19 +1,31 @@
-import authStore, { secret } from '@utils/store/auth';
 import jsonwebtoken from 'jsonwebtoken';
+import context from 'ctx';
 
-export default function decodeUserToken(jwt?: string): Auth.User|Auth.DiscordUser|null {
-    if (!jwt) return null;
+import { UserType } from 'enum';
+import authStore from '@stores/auth';
 
+export default function decodeUserToken(jwt: string): Auth.User|null {
     try {
-        const decoded = jsonwebtoken.verify(jwt, secret) as Auth.JWT|Auth.DiscordJWT;
-        const storedUser = (decoded as Auth.DiscordJWT).userId
-            ? authStore.get(`discordUsers.${(decoded as Auth.DiscordJWT).userId}`) as Auth.DiscordUser
-            : authStore.get(`users.${(decoded as Auth.JWT).username}`) as Auth.User;
+        const decoded = jsonwebtoken.verify(jwt, context.secret) as Auth.JWT;
+
+        if (decoded.t === UserType.Access) return {
+            type: UserType.Access,
+            displayName: decoded.dn
+        }
+
+        const storedUser = authStore.get(`users.${
+            decoded.t === UserType.Login
+                ? decoded.usr
+                : decoded.id
+        }`) as Auth.User & { type: UserType.Login|UserType.Discord };
+        
+        const ts = Math.floor(Date.now() / 1000);
 
         if (
             !storedUser ||
-            (decoded.timestamp !== storedUser.lastLogin) ||
-            (storedUser.lastLogout && (storedUser.lastLogout > decoded.timestamp))
+            (decoded.exp <= ts) ||
+            (decoded.iat !== storedUser.lastLogin) ||
+            (storedUser.lastLogout && (storedUser.lastLogout > decoded.iat))
         ) return null;
 
         return storedUser;

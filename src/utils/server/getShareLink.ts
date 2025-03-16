@@ -1,24 +1,38 @@
-import authStore from '@utils/store/auth'
+import authStore from '@stores/auth';
 
-export default function getShareLink(sid: string): Auth.ShareLink|string {
-    const link = authStore.get(`shareLinks.${sid}`) as Auth.ShareLink|undefined;
+export default function getShareLink(
+    sid: string,
+    increment: boolean = false,
+    deleteIfInvalid: boolean = true
+): Auth.ShareLink|string {
+    const key = `shareLinks.${sid}`;
+
+    const link = authStore.get(key) as Auth.ShareLink;
     if (!link) return 'Sharelink not found';
 
-    const expired = link.expiresAt
-        ? new Date(link.expiresAt).valueOf() < Date.now()
-        : false;
-
-    if (expired) {
-        return 'This link has expired';
+    if (
+        link.expiration &&
+        Math.floor(Date.now() / 1000) >= link.expiration
+    ) {
+        deleteIfInvalid && authStore.delete(key as keyof Auth.Store);
+        return 'Sharelink has expired';
     }
 
-    const currentUses = link.currentUses ?? 0;
-    const maxUses = link.maxUses ?? 0;
+    const currentUses = (link.uses ?? 0) + 1;
+    const maxUses = link.maxUses ?? Infinity;
 
-    if (
-        maxUses !== 0 &&
-        currentUses >= maxUses
-    ) return 'This link has already been used the max amount of times';
+    if (currentUses > maxUses) {
+        deleteIfInvalid && authStore.delete(key as keyof Auth.Store);
+        return 'Sharelink has been used the max amount of times';
+    }
+
+    if (increment) {
+        link.uses = currentUses;
+
+        // Delete the link if this was the final use
+        if (currentUses === maxUses) authStore.delete(key as keyof Auth.Store);
+        else authStore.set(key as keyof Auth.Store, link);
+    }
 
     return link;
 }

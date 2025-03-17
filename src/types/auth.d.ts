@@ -1,6 +1,8 @@
 declare global {
     namespace Auth {
         type User = {
+            /** Will be either the username, Discord user ID, or a randomly generated UUID */
+            _key: string;
             type: import('enum').UserType;
             functionOverrides?: Array<ControlMe.FunctionOverride>;
 
@@ -20,7 +22,6 @@ declare global {
             }
         ) & ({
             type: import('enum').UserType.Login|import('enum').UserType.Discord;
-            _key: string;
 
             /** Used for JWT validation */
             lastLogin?: number;
@@ -50,6 +51,9 @@ declare global {
             usr: string;
         } | {
             t: import('enum').UserType.Access;
+            
+            /** Random key */
+            k: string;
 
             /** Display name */
             dn: string;

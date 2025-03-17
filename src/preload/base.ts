@@ -16,7 +16,7 @@ const baseContext = {
     },
 
     version: () => ipcRenderer.invoke('version') as Promise<string>,
-    sendError: (err: unknown) => ipcRenderer.send('error', err),
+    sendError: (err: unknown, moduleName?: string) => ipcRenderer.send('error', err, moduleName),
 
     writeToClipboard: (str: string) => ipcRenderer.send('clipboard.write', str)
 };

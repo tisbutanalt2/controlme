@@ -58,7 +58,7 @@ declare global {
             value?: string;
             defaultValue?: string;
 
-            options?: { label: string; value: string }[];
+            options?: { label: string; value: unknown }[];
             onChange?(v?: string): void;
         }
 

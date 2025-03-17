@@ -11,6 +11,23 @@ declare global {
             server: string|undefined;
             ngrok: string|undefined;
         }
+
+        interface Notification {
+            id: string;
+
+            imageSrc?: string;
+            roundImage?: boolean;
+            imageWidth?: number;
+            imageHeight?: number;
+
+            title?: string;
+            message?: string;
+
+            yesNo?: boolean;
+            timeout?: number;
+
+            noClose?: boolean;
+        }
     }
 }
 

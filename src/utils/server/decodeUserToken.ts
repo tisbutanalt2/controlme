@@ -9,6 +9,7 @@ export default function decodeUserToken(jwt: string): Auth.User|null {
         const decoded = jsonwebtoken.verify(jwt, context.secret) as Auth.JWT;
 
         if (decoded.t === UserType.Access) return {
+            _key: decoded.k,
             type: UserType.Access,
             displayName: decoded.dn
         }

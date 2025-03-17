@@ -39,7 +39,7 @@
             "@server/*": ["src/server/*"],
             "@preload/*": ["src/preload/*"],
             "@muim/*": ["node_modules/@mui/material/*"],
-            "@muii/*": ["node_modules/@mui/material-icons/*"],
+            "@muii/*": ["node_modules/@mui/icons-material/*"],
             "@/*": ["src/*"]
         }
     },

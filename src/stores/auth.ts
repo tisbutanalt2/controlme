@@ -1,6 +1,13 @@
+import { app } from 'electron';
 import Store from 'electron-store';
-import { randomBytes } from 'crypto';
 
+import { rmSync } from 'fs';
+import { join } from 'path';
+
+import log from 'log';
+import sanitizeError from '@utils/sanitizeError';
+
+import { randomBytes } from 'crypto';
 import { ShareLinkType, UserType } from 'enum';
 
 const functionOverrides = {
@@ -14,7 +21,7 @@ const functionOverrides = {
     }
 } as const;
 
-const authStore = new Store<Auth.Store>({
+const createStore = () => new Store<Auth.Store>({
     name: 'auth',
     defaults: {
         secret: randomBytes(32).toString('hex'),
@@ -79,5 +86,14 @@ const authStore = new Store<Auth.Store>({
         }
     }
 });
+
+let authStore: Store<Auth.Store>;
+try {
+    authStore = createStore();
+} catch(err) {
+    log(`Failed to parse auth store: ${sanitizeError(err)}. Deleting...`); // TODO move instead?
+    rmSync(join(app.getPath('userData'), 'auth.json'), { force: true });
+    authStore = createStore();
+}
 
 export default authStore as Store<Auth.Store>;

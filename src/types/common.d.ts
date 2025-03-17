@@ -1,3 +1,5 @@
+import React from 'react';
+
 declare global {
     type RSAny = Record<string, unknown>;
 
@@ -13,6 +15,13 @@ declare global {
 
     /** React state */
     type State<T> = [T, React.Dispatch<React.SetStateAction<T>>];
+
+    /** React.FC */
+    type FC<Props = {}> = React.FC<React.PropsWithChildren<Props>>;
+    /** React.FC with { className?: string } */
+    type FCC<Props = {}> = FC<Props & { className?: string }>;
+
+    type ColorMode = 'light'|'dark';
 }
 
 export {};

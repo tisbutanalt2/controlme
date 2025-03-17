@@ -1,0 +1,71 @@
+:root {
+    --heading-font: 'Roboto', Helvetica, Arial, sans-serif;
+
+    --text-font: 'Roboto Slab', 'Roboto', Arial, sans-serif;
+    --code-font: 'Roboto Mono', monospace, sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+
+    color: var(--c-text);
+    font-family: var(--text-font);
+
+    &.module-main {
+        overflow: auto hidden;
+    }
+
+    &:not(.module-notification) {
+        background-color: var(--c-background);
+    }
+
+    &:not(.web-app) {
+        user-select: none;
+    }
+
+    &.module-popup, &.module-notification {
+        background-color: transparent;
+    }
+
+    &.module-notification {
+        overflow: hidden;
+    }
+}
+
+// Headings
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--heading-font);
+}
+
+// Links
+a {
+    color: var(--c-link);
+
+    &:active { opacity: .8; }
+    &:visited { color: var(--c-link-visited) }
+
+    user-select: initial;
+}
+
+// Code
+code, pre {
+    font-family: var(--code-font);
+}
+
+// Scrollbar
+@at-root:has(body.dark) {
+    ::-webkit-scrollbar {
+		width: 8px;
+		background-color: transparent;
+	}
+	
+	::-webkit-scrollbar-track {
+		background-color: transparent;
+	}
+	
+	::-webkit-scrollbar-thumb {
+		background-color: var(--c-text);
+		border-radius: 1rem;
+	}
+}

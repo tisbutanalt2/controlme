@@ -1,4 +1,11 @@
+import { app } from 'electron';
 import Store from 'electron-store';
+
+import { rmSync } from 'fs';
+import { join } from 'path';
+
+import log from 'log';
+import sanitizeError from '@utils/sanitizeError';
 
 const sharedFolder = {
     type: 'object',
@@ -9,7 +16,7 @@ const sharedFolder = {
     additionalProperties: false
 } as const;
 
-const configStore = new Store<ControlMe.Settings>({
+const createStore = () => new Store<ControlMe.Settings>({
     name: 'config',
     watch: true,
     defaults: {
@@ -55,6 +62,10 @@ const configStore = new Store<ControlMe.Settings>({
 
         discord: {
             useCustomApplication: false
+        },
+
+        chat: {
+            notifyOnMessage: true
         }
     },
     schema: {
@@ -155,8 +166,24 @@ const configStore = new Store<ControlMe.Settings>({
                 applicationId: { type: 'string' },
                 applicationSecret: { type: 'string' }
             }
+        },
+
+        chat: {
+            type: 'object',
+            properties: {
+                notifyOnMessage: { type: 'boolean' }
+            }
         }
     }
 });
 
-export default configStore as Store<ControlMe.Settings>;
+let configStore: Store<ControlMe.Settings>;
+try {
+    configStore = createStore();
+} catch(err) {
+    log(`Failed to parse config store: ${sanitizeError(err)}. Deleting...`);
+    rmSync(join(app.getPath('userData'), 'config.json'), { force: true });
+    configStore = createStore();
+}
+
+export default configStore;

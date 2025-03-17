@@ -14,7 +14,7 @@ declare global {
             expiration?: number;
     
             /** Optional function overrides */
-            functionOverrides: ControlMe.FunctionOverrides;
+            functionOverrides?: ControlMe.FunctionOverrides;
         }
 
         type ReducedShareLink = Pick<

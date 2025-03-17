@@ -1,0 +1,16 @@
+.module-main {
+    main {
+        margin: 24px 48px;
+        max-width: calc(100% - 96px);
+
+        h1 {
+            margin: 6px 0;
+        }
+
+        
+    }
+
+    .tabs {
+        background-color: var(--c-background-1);
+    }
+}

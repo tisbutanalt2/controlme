@@ -4,7 +4,7 @@ import { join, resolve } from 'path';
 import { isDev } from 'const';
 import { ServerStatus } from 'enum';
 
-import configStore from '@stores/config';
+//import configStore from '@stores/config';
 import authStore from '@stores/auth';
 
 import StatusProxy from './statusProxy';
@@ -18,7 +18,7 @@ const appIconPath = isDev
     ? join('assets', 'icon.png')
     : resolve(baseAppPath, '..', 'assets', 'icon.png');
 
-const preloadPath = join(appPath, 'reload');
+const preloadPath = join(appPath, 'preload');
 const userDataPath = app.getPath('userData');
 
 const initTime = new Date();
@@ -32,10 +32,17 @@ const context = {
     initTimestamp,
 
     mainWindow: undefined as Electron.BrowserWindow|undefined,
+    mainWindowMoving: false,
+
     modules: {
         popup: [] as Array<Electron.BrowserWindow>,
         notification: undefined as Electron.BrowserWindow|undefined,
         backgroundTasks: undefined as Electron.BrowserWindow|undefined
+    },
+
+    endPassthroughCallbacks: {
+        popup: [] as Array<(() => void)>,
+        notification: undefined as (() => void)|undefined
     },
 
     webPath: join(appPath, 'web', 'index.html'),
@@ -45,8 +52,9 @@ const context = {
         notification: join(preloadPath, 'notification.js')
     },
 
-    config: configStore,
-    auth: authStore,
+    // Shortcuts (not used)
+    //config: configStore,
+    //auth: authStore,
     secret: String(authStore.get('secret')),
 
     userDataPath,
@@ -60,7 +68,7 @@ const context = {
     appIcon: nativeImage.createFromPath(appIconPath),
 
     tray: undefined as Electron.Tray|undefined,
-    sockets: [] as Array<string>,
+    sockets: [] as Array<ControlMe.Socket>,
 
     statuses: new StatusProxy<ControlMe.Statuses>('status', {
         server: ServerStatus.Closed,

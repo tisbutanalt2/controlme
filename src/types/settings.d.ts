@@ -77,6 +77,11 @@ declare global {
                 useCustomApplication: boolean;
                 applicationId?: string;
                 applicationSecret?: string;
+            };
+
+            chat: {
+                /** Displays a notification when a message is sent, unless the chat window is actively focused on */
+                notifyOnMessage: boolean;
             }
         }
     }

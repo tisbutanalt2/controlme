@@ -7,6 +7,7 @@ import serverFunctions from './server';
 import ngrokFunctions from './ngrok';
 
 import shareFunctions from './share';
+import chatFunctions from './chat';
 
 const context = {
     ...baseContext,
@@ -15,7 +16,8 @@ const context = {
     ...serverFunctions,
     ...ngrokFunctions,
 
-    ...shareFunctions
+    ...shareFunctions,
+    ...chatFunctions
 };
 
 declare global {
@@ -25,6 +27,4 @@ declare global {
 }
 
 contextBridge.exposeInMainWorld('ipcMain', context);
-contextBridge.exposeInMainWorld('ipc', context);
-
 export {};

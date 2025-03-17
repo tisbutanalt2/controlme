@@ -2,11 +2,11 @@ import { ipcRenderer } from 'electron';
 
 const configFunctions = {
     getConfigValue: <T = any>(k: string) => ipcRenderer.invoke('config.get', k) as Promise<T>,
-    setConfigValue: (k: string, v: any) => ipcRenderer.invoke('config.set', k, v),
+    setConfigValue: (k: string, v: any) => ipcRenderer.send('config.set', k, v),
 
     getConfig: () => ipcRenderer.invoke('config.get') as Promise<ControlMe.Settings>,
-    purgeUsers: () => ipcRenderer.send('auth.purgeUsers'),
-    deleteUsers: () => ipcRenderer.send('auth.deleteUsers'),
+    purgeUsers: () => ipcRenderer.invoke('auth.purgeUsers'),
+    deleteUsers: () => ipcRenderer.invoke('auth.deleteUsers'),
 
     onConfigValueChange: <T = any>(k: string, cb: Listener) => {
         ipcRenderer.send('config.subscribeToChange', k);

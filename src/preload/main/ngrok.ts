@@ -3,6 +3,7 @@ import { ipcRenderer } from 'electron';
 const ngrokFunctions = {
     startNgrok: () => ipcRenderer.invoke('ngrok.start'),
     stopNgrok: () => ipcRenderer.invoke('ngrok.stop'),
+    restartNgrok: () => ipcRenderer.invoke('ngrok.restart'),
 
     ngrokUrl: () => ipcRenderer.invoke('ngrok.url') as Promise<string|undefined>,
     

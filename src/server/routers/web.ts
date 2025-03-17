@@ -1,6 +1,7 @@
 import { Router, static as expressStatic } from 'express';
-import { join } from 'path';
+import { join, resolve } from 'path';
 
+import context from 'ctx';
 import authStore from '@stores/auth';
 
 const webPath = join(__dirname, '..', 'web');
@@ -15,6 +16,12 @@ web.get('/', (req, res) => {
 
     res.sendFile(
         join(webPath, 'index.html')
+    );
+});
+
+web.get('/favicon.ico', (_req, res) => {
+    res.sendFile(
+        resolve(context.appIconPath)
     );
 });
 

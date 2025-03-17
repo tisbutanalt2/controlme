@@ -8,8 +8,8 @@ export default function getFunctionAccess(
     const base = configStore.get('functions');
     Object
         .entries(base)
-        .forEach(([name, allow]) => {
-            allow && functions.add(name);
+        .forEach(([name, func]) => {
+            func.enabled && functions.add(name);
         });
 
     overrides?.forEach(override => {

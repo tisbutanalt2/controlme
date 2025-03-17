@@ -21,6 +21,31 @@ const functionOverrides = {
     }
 } as const;
 
+export const userDef = {
+    type: 'object',
+    properties: {
+        type: {
+            type: 'number',
+            enum: Object.values(UserType) as Array<number>
+        },
+        functionOverrides,
+
+        displayName: { type: 'string' },
+
+        lastLogin: { type: 'number' },
+        lastLogout: { type: 'number' },
+
+        // Login specific
+        username: { type: 'string' },
+        password: { type: 'string' },
+
+        // Discord specific
+        userId: { type: 'string' },
+        avatar: { type: 'string' }
+    },
+    required: ['type', 'displayName']
+} as const;
+
 const createStore = () => new Store<Auth.Store>({
     name: 'auth',
     defaults: {
@@ -34,30 +59,7 @@ const createStore = () => new Store<Auth.Store>({
         users: {
             type: 'object',
             patternProperties: {
-                '.*': {
-                    type: 'object',
-                    properties: {
-                        type: {
-                            type: 'number',
-                            enum: Object.values(UserType) as Array<number>
-                        },
-                        functionOverrides,
-
-                        displayName: { type: 'string' },
-
-                        lastLogin: { type: 'number' },
-                        lastLogout: { type: 'number' },
-
-                        // Login specific
-                        username: { type: 'string' },
-                        password: { type: 'string' },
-
-                        // Discord specific
-                        userId: { type: 'string' },
-                        avatar: { type: 'string' }
-                    },
-                    required: ['type', 'displayName']
-                }
+                '.*': userDef as unknown
             }
         },
 

@@ -4,6 +4,23 @@ import context from 'ctx';
 import { appTitle, isDev } from 'const';
 import createMainWindow from './mainWindow';
 
+const refreshMain = () => context.mainWindow?.webContents.reload();
+
+const refreshPopups = () => context.modules.popup.forEach(win => {
+    context.endPassthroughCallbacks.popup.forEach(cb => cb());
+    win.webContents.reload();
+    win.setIgnoreMouseEvents(true, { forward: true });
+});
+
+const refreshNotification = () => {
+    context.endPassthroughCallbacks.notification?.();
+    context.modules.notification?.webContents.reload();
+}
+
+const refreshBackgroundTasks = () => {
+    context.modules.backgroundTasks?.webContents.reload();
+}
+
 export default function createTray() {
     const template: Electron.MenuItemConstructorOptions[] = [
         {
@@ -16,30 +33,33 @@ export default function createTray() {
             type: 'submenu',
             submenu: [
                 {
-                    label: 'Control panel',
-                    click: () => context.mainWindow?.webContents.reload()
-                },
-
-                {
-                    label: 'Popups',
-                    click: () => context.modules.popup.forEach(win => {
-                        context.endPassthroughCallbacks.popup.forEach(cb => cb());
-                        win.webContents.reload();
-                        win.setIgnoreMouseEvents(true, { forward: true });
-                    })
-                },
-        
-                {
-                    label: 'Notifications',
+                    label: 'All',
                     click: () => {
-                        context.endPassthroughCallbacks.notification?.();
-                        context.modules.notification?.webContents.reload();
+                        refreshMain();
+                        refreshPopups();
+                        refreshNotification();
+                        refreshBackgroundTasks();
                     }
                 },
 
                 {
+                    label: 'Control panel',
+                    click: refreshMain
+                },
+
+                {
+                    label: 'Popups',
+                    click: refreshPopups
+                },
+        
+                {
+                    label: 'Notifications',
+                    click: refreshNotification
+                },
+
+                {
                     label: 'Background tasks',
-                    click: () => context.modules.backgroundTasks?.webContents.reload()
+                    click: () => refreshBackgroundTasks
                 }
             ]
         },

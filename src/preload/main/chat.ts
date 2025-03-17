@@ -1,8 +1,8 @@
 import { ipcRenderer } from 'electron';
 
 const chatFunctions = {
-    onChatMessage: (handler: (msg: ControlMe.ChatMessage) => void) => {
-        const listener = (_e, msg: ControlMe.ChatMessage) => {
+    onChatMessage: (handler: (msg: ControlMe.Chat.Message) => void) => {
+        const listener = (_e, msg: ControlMe.Chat.Message) => {
             handler(msg);
         }
 
@@ -10,7 +10,7 @@ const chatFunctions = {
         return () => ipcRenderer.off('chat.message', listener);
     },
 
-    sendChatMessage: (msg: Omit<ControlMe.ChatMessage, 'id'> & { isHost: true }) =>
+    sendChatMessage: (msg: Omit<ControlMe.Chat.Message, 'id'> & { isHost: true }) =>
         ipcRenderer.invoke('chat.send', msg) as Promise<string>
 };
 

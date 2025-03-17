@@ -4,6 +4,8 @@ import Store from 'electron-store';
 import { rmSync } from 'fs';
 import { join } from 'path';
 
+import { defaultSettings } from 'const';
+
 import log from 'log';
 import sanitizeError from '@utils/sanitizeError';
 
@@ -13,61 +15,14 @@ const sharedFolder = {
         name: { type: 'string' },
         path: { type: 'string' }
     },
+    required: ['path'],
     additionalProperties: false
 } as const;
 
 const createStore = () => new Store<ControlMe.Settings>({
     name: 'config',
     watch: true,
-    defaults: {
-        general: {
-            disableWarnings: false,
-            startMinimized: false,
-            exitOnClose: true,
-            launchOnStartup: false
-        },
-
-        appearance: {
-            title: 'Control Me!',
-            darkTheme: true
-        },
-
-        functions: {},
-
-        files: {
-            mediaFolders: [],
-            fileFolders: []
-        },
-
-        security: {
-            disablePanicKeybind: false,
-
-            checkForBadHashes: true,
-            disableAuth: false,
-
-            approveAuth: true,
-            alwaysApproveAuth: false,
-
-            disableFutureRequests: false
-        },
-
-        server: {
-            autoStart: true,
-            notifyOnStart: true
-        },
-
-        ngrok: {
-            autoStart: true
-        },
-
-        discord: {
-            useCustomApplication: false
-        },
-
-        chat: {
-            notifyOnMessage: true
-        }
-    },
+    defaults: defaultSettings,
     schema: {
         general: {
             type: 'object',
@@ -78,7 +33,13 @@ const createStore = () => new Store<ControlMe.Settings>({
                 exitOnClose: { type: 'boolean' },
 
                 launchOnStartup: { type: 'boolean' }
-            }
+            },
+            required: [
+                'disableWarnings',
+                'startMinimized',
+                'exitOnClose',
+                'launchOnStartup'
+            ]
         },
 
         appearance: {
@@ -86,13 +47,28 @@ const createStore = () => new Store<ControlMe.Settings>({
             properties: {
                 title: { type: 'string' },
                 darkTheme: { type: 'boolean' }
-            }
+            },
+            required: ['darkTheme']
         },
 
         functions: {
             type: 'object',
             patternProperties: {
-                '.*': { type: 'boolean' }
+                '.*': {
+                    type: 'object',
+                    properties: {
+                        enabled: { type: 'boolean' }
+                    },
+                    additionalProperties: {
+                        oneOf: [
+                            { type: 'string' },
+                            { type: 'number' },
+                            { type: 'boolean' },
+                            { type: 'object' }
+                        ]
+                    },
+                    required: ['enabled']
+                }
             }
         },
 
@@ -103,13 +79,14 @@ const createStore = () => new Store<ControlMe.Settings>({
             properties: {
                 mediaFolders: {
                     type: 'array',
-                    items: sharedFolder
+                    items: sharedFolder as unknown
                 },
                 fileFolders: {
                     type: 'array',
-                    items: sharedFolder
+                    items: sharedFolder as unknown
                 }
-            }
+            },
+            required: ['mediaFolders', 'fileFolders']
         },
 
         security: {
@@ -126,7 +103,18 @@ const createStore = () => new Store<ControlMe.Settings>({
                 alwaysApproveAuth: { type: 'boolean' },
 
                 disableFutureRequests: { type: 'boolean' }
-            }
+            },
+            required: [
+                'disablePanicKeybind',
+                
+                'checkForBadHashes',
+                'disableAuth',
+
+                'approveAuth',
+                'alwaysApproveAuth',
+
+                'disableFutureRequests'
+            ]
         },
 
         server: {
@@ -136,7 +124,11 @@ const createStore = () => new Store<ControlMe.Settings>({
                 autoStart: { type: 'boolean' },
                 notifyOnStart: { type: 'boolean' },
                 address: { type: 'string' }
-            }
+            },
+            required: [
+                'autoStart',
+                'notifyOnStart'
+            ]
         },
 
         ngrok: {
@@ -153,10 +145,14 @@ const createStore = () => new Store<ControlMe.Settings>({
                         properties: {
                             domain: { type: 'string' },
                             authToken: { type: 'string' }
-                        }
+                        },
+                        required: ['authToken']
                     }
                 }
-            }
+            },
+            required: [
+                'autoStart'
+            ]
         },
 
         discord: {
@@ -165,14 +161,20 @@ const createStore = () => new Store<ControlMe.Settings>({
                 useCustomApplication: { type: 'boolean' },
                 applicationId: { type: 'string' },
                 applicationSecret: { type: 'string' }
-            }
+            },
+            required: [
+                'useCustomApplication'
+            ]
         },
 
         chat: {
             type: 'object',
             properties: {
                 notifyOnMessage: { type: 'boolean' }
-            }
+            },
+            required: [
+                'notifyOnMessage'
+            ]
         }
     }
 });

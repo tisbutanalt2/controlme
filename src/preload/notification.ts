@@ -12,7 +12,8 @@ const context = {
         ipcRenderer.on('notification', listener);
         return () => ipcRenderer.off('notification', listener);
     },
-    notificationResult: (id: string, v: boolean|null) => ipcRenderer.send('notificationResult', id, v)
+    notificationResult: (id: string, v: boolean|null) => ipcRenderer.send('notification.result', id, v),
+    ready: () => ipcRenderer.send('notification.ready')
 };
 
 declare global {

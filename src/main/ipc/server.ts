@@ -1,9 +1,11 @@
-import { ipcMain, Notification } from 'electron';
+import { ipcMain } from 'electron';
 
 import context from 'ctx';
 
 import startExpress from 'server';
 import { ServerStatus } from 'enum';
+
+import { displayNotification } from './notification';
 
 import sanitizeError from '@utils/sanitizeError';
 import log from 'log';
@@ -39,11 +41,11 @@ export const startServer = async (port: number = 3000) => {
         context.statuses.server = ServerStatus.Open;
         context.server = res;
 
-        configStore.get('server.notifyOnStart') && new Notification({
+        configStore.get('server.notifyOnStart') && displayNotification({
             title: 'Server started',
-            icon: context.appIcon,
-            body: `Listening on port ${res.port}`
-        }).show();
+            message: `Listening on port ${res.port}`,
+            timeout: 5000
+        }, true);
     } catch(err) {
         log(`Failed to start server: ${sanitizeError(err)}`);
 
@@ -65,7 +67,6 @@ const closeServer = () => {
 
 export const stopServer = async () => {
     if (context.statuses.server !== ServerStatus.Open) return console.warn('stopServer was called when server is already closed');
-    
     await context.server.io.close(closeServer);
 
     // Edge case

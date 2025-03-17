@@ -5,11 +5,6 @@ declare global {
             path: string;
         }
 
-        interface NgrokFallback {
-            domain: string;
-            authToken: string;
-        }
-
         interface Settings {
             general: {
                 disableWarnings: boolean;
@@ -25,7 +20,7 @@ declare global {
                 darkTheme: boolean;
             };
 
-            functions: Record<string, boolean>;
+            functions: Record<string, StoredFunction>;
             webcamDevice?: string;
 
             files: {

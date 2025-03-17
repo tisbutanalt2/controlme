@@ -4,6 +4,7 @@ import { usePromptCaller } from '@context/Prompt';
 import { useForm } from '@context/Form';
 
 import { dangerousOption } from '@utils/prompts';
+import { useDisableWarnings } from '@context/DisableWarnings';
 
 import FieldBase from './Base'
 import MUI from '@appui/mui';
@@ -12,11 +13,14 @@ const Checkbox: FC<UI.FieldBaseProps & UI.CheckboxFieldProps> = props => {
     const { state: [form] } = useForm();
     const isError = !!props.error;
 
+    const disableWarnings = useDisableWarnings();
+
     const promptCaller = usePromptCaller();
     const onChange = useCallback((v: boolean) => {
         const handleChange = () => props.onChange?.(v);
 
         if (
+            !disableWarnings &&
             ['medium', 'high'].includes(props.warningLevel) &&
             (props.warningOnFalse? !v: v)
         )
@@ -25,6 +29,7 @@ const Checkbox: FC<UI.FieldBaseProps & UI.CheckboxFieldProps> = props => {
         else
             handleChange();
     }, [
+        disableWarnings,
         promptCaller,
         props.onChange,
         props.warningLevel,

@@ -11,6 +11,11 @@ declare global {
             name: string;
             type: import('enum').FieldType;
         }
+
+        interface StoredFunction {
+            enabled: boolean;
+            options?: Record<string, unknown>;
+        }
     
         interface Function {
             title: string;

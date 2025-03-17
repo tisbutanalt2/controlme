@@ -4,6 +4,8 @@ import { join } from 'path';
 import context from '@main/context';
 import { isDev } from 'const';
 
+import sanitizeError from '@utils/sanitizeError';
+
 const resetColor = '\x1b[0m';
 const infoColor = '\x1b[36m';
 const warningColor = '\x1b[33m';
@@ -11,6 +13,8 @@ const errorColor = '\x1b[31m';
 
 let writing = false;
 export default function log(msg: any, logType: 'info'|'warning'|'error' = 'info') {
+    logType === 'error' && (msg = sanitizeError(msg));
+    
     const col = logType === 'info'
         ? infoColor
         : logType === 'warning'

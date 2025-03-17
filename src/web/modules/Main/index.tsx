@@ -8,7 +8,6 @@ import Welcome from './Welcome';
 import Chat from './Chat';
 import Share from './Share';
 import Settings from './Settings';
-import About from './About';
 
 const MainTabs = () => {
     const location = useLocation() as Location<string>;
@@ -25,7 +24,6 @@ const MainTabs = () => {
             <Route path="/chat" element={<Chat />} />
             <Route path="/share" element={<Share />} />
             <Route path="/settings" element={<Settings />} />
-            <Route path="/about" element={<About />} />
         </Routes>
     </Tabs>
 }

@@ -75,13 +75,13 @@ const context = {
         ngrok: ServerStatus.Closed
     }) as ControlMe.Statuses,
 
-    errors: new StatusProxy<ControlMe.Errors>('errors', {
+    errors: new StatusProxy<ControlMe.Errors>('error', {
         server: undefined,
         ngrok: undefined
     }) as ControlMe.Errors,
 
     server: undefined as ControlMe.Server|undefined,
-    ngrok: undefined //as ControlMe.Ngrok|undefined
+    ngrok: undefined as ControlMe.Ngrok|undefined
 }
 
 export default context;

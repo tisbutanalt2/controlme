@@ -8,7 +8,7 @@ export default class StatusProxy<T> {
             get: <Key extends string & keyof T>(obj, k: Key) => obj[k] as T[Key],
             
             set: <Key extends string & keyof T>(obj, k: Key, status: T[Key]) => {
-                const channel = `${k}${channelSuffix}`;
+                const channel = `${k}.${channelSuffix}`;
                 
                 obj[k] = status;
                 context.mainWindow?.webContents.send(channel, status);

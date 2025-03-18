@@ -7,12 +7,14 @@ import MenuTab from './MenuTab';
 import GeneralSettings from './General';
 import AppearanceSettings from './Appearance';
 import FunctionSettings from './Functions';
-import About from './About';
+import ChatSettings from './Chat';
 import WebcamSettings from './Webcam';
 import FileSettings from './Files';
 import SecuritySettings from './Security';
 import ServerSettings from './Server';
 import NgrokSettings from './Ngrok';
+import DiscordSettings from './Discord';
+import About from './About';
 
 export const SettingsContext = createContext<State<ControlMe.Settings>>([defaultSettings, () => {}]);
 export const useSettingsContext = () => useContext(SettingsContext);
@@ -75,6 +77,10 @@ const Settings = () => {
                             <FunctionSettings />
                         </MenuTab>
 
+                        <MenuTab name="chat" title="Chat Settings">
+                            <ChatSettings />
+                        </MenuTab>
+
                         <MenuTab name="webcam" title="Webcam Settings">
                             <WebcamSettings />
                         </MenuTab>
@@ -93,6 +99,10 @@ const Settings = () => {
 
                         <MenuTab name="ngrok" title="Ngrok Settings">
                             <NgrokSettings />
+                        </MenuTab>
+
+                        <MenuTab name="discord" title="Discord Settings">
+                            <DiscordSettings />
                         </MenuTab>
 
                         <MenuTab name="about" title="About App">

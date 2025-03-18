@@ -21,7 +21,7 @@ declare global {
                 type: import('enum').UserType.Access;
             }
         ) & ({
-            type: import('enum').UserType.Login|import('enum').UserType.Discord;
+            type: import('enum').UserType.Login | import('enum').UserType.Discord;
 
             /** Used for JWT validation */
             lastLogin?: number;

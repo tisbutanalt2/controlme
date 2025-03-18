@@ -11,6 +11,7 @@ import OutlinedInput from '@muim/OutlinedInput';
 import Checkbox from '@muim/Checkbox';
 import Switch from '@muim/Switch';
 import Select from '@muim/Select';
+import Tooltip from '@muim/Tooltip';
 
 import InputLabel from '@muim/InputLabel';
 import FormHelperText from '@muim/FormHelperText';
@@ -33,6 +34,7 @@ const MUI = {
     Checkbox,
     Switch,
     Select,
+    Tooltip,
 
     Label: InputLabel,
     HelperText: FormHelperText,

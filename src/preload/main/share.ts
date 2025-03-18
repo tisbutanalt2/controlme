@@ -1,15 +1,34 @@
 import { ipcRenderer } from 'electron';
 
 const shareFunctions = {
-    getShareLinks: () => ipcRenderer.invoke('shareLink.getAll') as Promise<Auth.ShareLink[]>,
+    getShareLinks: () => ipcRenderer.invoke('share.get') as Promise<Auth.ShareLink[]>,
 
     generateShareLink: (options: Omit<Auth.ShareLink, 'id'>) =>
-        ipcRenderer.invoke('shareLink.generate', options) as Promise<string>,
+        ipcRenderer.invoke('share.generate', options) as Promise<Auth.ShareLink>,
 
-    modifyShareLink: (id: string, options: Partial<Auth.ShareLink>) =>
-        ipcRenderer.invoke('shareLink.modify', id, options),
+    deleteShareLink: (id: string) => ipcRenderer.send('share.delete', id),
 
-    deleteShareLink: (id: string) => ipcRenderer.invoke('shareLink.delete', id)
+    onShareLinkAdded: (cb: (link: Auth.ShareLink) => void) => {
+        const listener = (e, link: Auth.ShareLink) => {
+            cb(link);
+        }
+
+        ipcRenderer.on('share.added', listener);
+        return () => {
+            ipcRenderer.off('share.added', listener);
+        }
+    },
+
+    onShareLinkDeleted: (cb: (id: string) => void) => {
+        const listener = (e, id: string) => {
+            cb(id);
+        }
+
+        ipcRenderer.on('share.deleted', listener);
+        return () => {
+            ipcRenderer.off('share.deleted', listener);
+        }
+    }
 };
 
 export default shareFunctions;

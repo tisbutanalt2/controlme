@@ -15,8 +15,19 @@ const SecuritySettings = () => {
             warningLevel="high"
             type="switch"
             label="Disable panic keybind"
-            description="Disables the keybind you can use to forcefully quit the app"
+            description="Disables the keybind you can use to forcefully quit the app."
             warningMessage="This option disables the ability to close the app in an alternative way (Ctrl+Shift+P). Are you sure you want to turn this keybind off?"
+        />
+
+        <UI.Field
+            name="checkForBadHashes"
+            type="switch"
+            warningLevel="high"
+            color="primary"
+            warningOnFalse
+            label="Check for malicious uploads (recommended)"
+            description="If enabled will compare uploaded files hashes to a list of known bad hashes, will also use the third party server in the future."
+            warningMessage="It is highly recommended to keep this on. Are you sure you want to disable it?"
         />
 
         <UI.Field
@@ -29,47 +40,38 @@ const SecuritySettings = () => {
         />
 
         <UI.Field
-            name="checkForBadHashes"
-            type="switch"
-            warningLevel="high"
-            color="primary"
-            warningOnFalse
-            label="Check for malicious uploads (recommended)"
-            description="If enabled will compare uploaded files hashes to a list of known bad hashes. Will also use the third party server in the future."
-            warningMessage="It is highly recommended to keep this on. Are you sure you want to continue?"
-        />
-
-        <UI.Field
             name="approveAuth"
             warningLevel="medium"
             color="primary"
             warningOnFalse
             type="switch"
             label="Approve authentication requests (recommended)"
-            description="If enabled will require you to approve of each connection request"
-            warningMessage="This setting prevents unwanted users to connect without your knowledge"
+            description="If enabled will require you to approve of each connection request."
+            warningMessage="This setting prevents users to connect without your approval. Are you sure you want to disable it?"
+            disabled={settings.security.disableAuth}
         />
 
         <UI.Field
             name="alwaysApproveAuth"
             type="switch"
             label="Always approve requests"
-            description="If enabled will always require manual approval, even if the user has previously connected"
-            disabled={!settings.security.approveAuth}
+            description="If enabled will always require manual approval, even if the user has previously connected."
+            disabled={!settings.security.approveAuth || settings.security.disableAuth}
         />
 
         <UI.Field
             name="disableFutureRequests"
             type="switch"
             label="Disable new requests"
-            description="Enable to reject any new authentication requests. Useful when you do not want any new users to connect."
+            description="Enable to reject any new authentication requests, useful when you do not want any new users to connect."
+            disabled={settings.security.disableAuth}
         />
 
         <UI.Field
             name="thirdPartyServer"
             type="text"
             label="Third party server"
-            description="Server used for remote authentication and hash checking, make sure you REALLY trust this server"
+            description="Server used for remote authentication and hash checking, make sure you REALLY trust this server."
             placeholder="https://alive-gazelle-noted.ngrok-free.app"
             sx={{ width: '360px' }}
         />

@@ -26,6 +26,13 @@ const ServerSettings = () => {
     }, [mounted]);
 
     return <TabForm id="settings-server" name="server">
+        <UI.MUI.HelperText>
+            To grant access to your computer, this app hosts a website.
+            <br />
+            The server can be on any port, as long as you ensure that
+            traffic can reach it.
+        </UI.MUI.HelperText>
+
         <UI.Field
             name="autoStart"
             type="switch"

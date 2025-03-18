@@ -16,7 +16,7 @@ const Fallback: FC<ControlMe.NgrokFallback & { arraykey: number }> = props => {
 
     return <UI.Stack direction="row" gap="12px">
         <UI.MUI.TextField
-            type="text"
+            type="password"
             label="Authtoken"
             value={data?.authToken}
             onChange={e => setSettings(prev => {
@@ -46,21 +46,23 @@ const Fallback: FC<ControlMe.NgrokFallback & { arraykey: number }> = props => {
             })}
         />
 
-        <UI.MUI.IconButton
-            color="error"
-            onClick={() => {
-                setSettings(prev => {
-                    const copy = { ...prev, ngrok: { ...prev.ngrok } };
+        <UI.MUI.Tooltip title="Delete Fallback">
+            <UI.MUI.IconButton
+                color="error"
+                onClick={() => {
+                    setSettings(prev => {
+                        const copy = { ...prev, ngrok: { ...prev.ngrok } };
 
-                    copy.ngrok.fallbacks?.splice(props.arraykey, 1);
-                    copy.ngrok.fallbacks = [...copy.ngrok.fallbacks];
+                        copy.ngrok.fallbacks?.splice(props.arraykey, 1);
+                        copy.ngrok.fallbacks = [...copy.ngrok.fallbacks];
 
-                    return copy;
-                });
-            }}
-        >
-            <DeleteIcon />
-        </UI.MUI.IconButton>
+                        return copy;
+                    });
+                }}
+            >
+                <DeleteIcon />
+            </UI.MUI.IconButton>
+        </UI.MUI.Tooltip>
     </UI.Stack>
 }
 
@@ -118,8 +120,9 @@ const NgrokSettings = () => {
             name="authToken"
             helperId="settings-ngrok-authToken-helper"
             type="text"
+            password
             label="Auth token"
-            sx={{ mt: '12px', width: '400px' }}
+            sx={{ mt: '12px', width: '300px' }}
         />
 
         <UI.MUI.HelperText id="settings-ngrok-authToken-helper">
@@ -173,7 +176,7 @@ const NgrokSettings = () => {
             >Retry</UI.Button>
         </UI.Stack>
 
-        <h2>Fallbacks</h2>
+        <h2>Fallback Accounts</h2>
         <UI.MUI.HelperText sx={{ mb: '16px' }}>
             Ngrok comes with a monthly data limit. You may add multiple auth tokens and domains here, and the app will automatically
             try each one until it can successfully connect.

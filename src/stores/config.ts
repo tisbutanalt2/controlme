@@ -13,9 +13,10 @@ const sharedFolder = {
     type: 'object',
     properties: {
         name: { type: 'string' },
-        path: { type: 'string' }
+        path: { type: 'string' },
+        id: { type: 'string' }
     },
-    required: ['path'],
+    required: ['path', 'id'],
     additionalProperties: false
 } as const;
 

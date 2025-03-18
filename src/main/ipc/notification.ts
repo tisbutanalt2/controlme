@@ -13,12 +13,17 @@ export const displayNotification = async (notif: Omit<ControlMe.Notification, 'i
     
     if (useAppIcon) {
         notif.imageSrc = pathToFileURL(context.appIconPath).pathname;
+        notif.roundImage = true;
         notif.imageWidth = 64;
         notif.imageHeight = 64;
     }
+
+    if (notif.timeout === undefined) notif.timeout = 5000;
     
-    for (let i = 0; i < 10; i++) {
-        if (!notificationReady) await waitForSeconds(0.5);
+    if (!notificationReady) {
+        for (let i = 0; i < 10; i++) {
+            if (!notificationReady) await waitForSeconds(0.5);
+        }
     }
 
     if (!context.modules.notification) return;

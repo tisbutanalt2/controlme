@@ -1,4 +1,4 @@
-import { default as MuiButton, ButtonProps } from '@muim/Button';
+import { default as MuiButton, type ButtonProps } from '@muim/Button';
 
 const Button: FC<ButtonProps> = ({ children, ...props }) => <MuiButton
     variant="outlined"

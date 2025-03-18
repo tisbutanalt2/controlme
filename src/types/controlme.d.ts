@@ -8,8 +8,8 @@ declare global {
         }
 
         interface Errors {
-            server: string|undefined;
-            ngrok: string|undefined;
+            server: string | undefined;
+            ngrok: string | undefined;
         }
 
         interface Notification {

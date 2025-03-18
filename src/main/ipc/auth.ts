@@ -28,3 +28,14 @@ ipcMain.handle('users.deleteAll', () => {
     context.sockets.forEach(socket => socket.disconnect());
     return true;
 });
+
+const subscribedKeys = new Set<string>();
+ipcMain.on('auth.subcribeToChange', (e, key: string) => {
+    if (subscribedKeys.has(key)) return;
+    
+    authStore.onDidChange(key as keyof Auth.Store, v => {
+        e.sender.send('auth.valueChange', key, v);
+    });
+    
+    subscribedKeys.add(key);
+});

@@ -38,8 +38,14 @@ const NumberField: FC<UI.NumberFieldProps & UI.FieldBaseProps> = props => {
 
                     props.onChange(
                         Number.isFinite(newValue)
-                            ?newValue
-                            :undefined
+                            ? (props.allowEmpty
+                                ? (e.currentTarget.value === ''
+                                    ? undefined
+                                    : newValue
+                                )
+                                : newValue
+                            )
+                            : undefined
                     );
                 }}
             />

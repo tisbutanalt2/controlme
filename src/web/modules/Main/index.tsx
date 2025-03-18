@@ -21,10 +21,14 @@ const MainTabs = () => {
     >
         <Routes>
             <Route path="/" element={<Welcome />} />
-            <Route path="/chat" element={<Chat />} />
             <Route path="/share" element={<Share />} />
+            <Route path="/chat" element={<></>} />
             <Route path="/settings" element={<Settings />} />
         </Routes>
+
+        <div hidden={location.pathname !== '/chat'}>
+            <Chat />
+        </div>
     </Tabs>
 }
 

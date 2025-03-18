@@ -1,7 +1,7 @@
 declare global {
     namespace UI {
         interface FieldBaseProps {
-            name: string;
+            name?: string;
 
             id?: string;
             helperId?: string;
@@ -33,6 +33,8 @@ declare global {
             value?: number;
             defaultValue?: number;
             defaultValueWhenEmpty?: number;
+
+            allowEmpty?: boolean;
 
             min?: number;
             max?: number;

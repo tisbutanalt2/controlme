@@ -23,6 +23,7 @@
             "enum": ["src/enum"],
             "ctx": ["src/main/context"],
             "log": ["src/log"],
+            "functions": ["src/functions/index"],
             "server": ["src/server/index"],
             "@stores/*": ["src/stores/*"],
             "@ipc/*": ["src/main/ipc/*"],

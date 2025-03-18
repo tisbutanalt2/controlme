@@ -11,14 +11,14 @@ const AppearanceSettings = () => {
             name="title"
             type="text"
             label="Computer Name"
-            description="Set a unique title for the browser tab"
+            description="Set a unique title for the browser tab."
         />
 
         <UI.Field
             name="darkTheme"
             type="switch"
             label={`Dark Theme ${colorMode === 'light' ? '🥶' : '😎'}`}
-            description="For your eyes"
+            description="For your eyes."
             value={colorMode === 'dark'}
             onChange={v => {
                 setColorMode(v ? 'dark' : 'light');

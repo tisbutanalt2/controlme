@@ -8,7 +8,8 @@ import Main from './modules/Main';
 import Notification from './modules/Notification';
 import Popup from './modules/Popup';
 
-const root = createRoot(document.querySelector('div#root'));
+const rootDiv = document.querySelector('div#root');
+const root = createRoot(rootDiv);
 
 const appModule = getSearchParam('module');
 if (appModule) {
@@ -18,6 +19,11 @@ if (appModule) {
 
 window.onerror = (err) => {
     (window.ipcMain ?? window.ipcNotification)?.sendError(String(err), appModule);
+
+    if (rootDiv.innerHTML) root.render(<main>
+        <pre style={{ color: 'var(--c-error)' }}>A web error ocurred. Please reload the app.</pre>
+        <pre style={{ color: 'var(--c-error)' }}>{String((err instanceof Error) ? err.message : err)}</pre>
+    </main>)
 };
 
 switch(appModule) {

@@ -1,4 +1,10 @@
 .module-main {
+    &.dark {
+        background-image: linear-gradient(to bottom, var(--c-background), 80%, #0f0f0f);
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+
     main {
         margin: 48px;
         max-width: calc(100% - 96px);    

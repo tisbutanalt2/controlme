@@ -32,11 +32,14 @@ const WebcamSettings = () => {
         currentDevice && window.ipcMain.setConfigValue('webcamDevice', currentDevice);
     }, [currentDevice]);
 
+    if (!fetched) return null;
+    if (!webcams.length) return <pre>You don't have any webcams connected</pre>
+
     return <UI.Field
         name="webcamDevice"
         type="select"
         label="Device"
-        description="Set which webcam you want the app to use when capturing your camera"
+        description="Set which webcam you want the app to use when capturing your camera."
         value={currentDevice}
         options={webcams.filter(d => d.id).map((device) => ({
             value: device.id,

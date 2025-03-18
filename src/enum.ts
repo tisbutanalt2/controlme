@@ -35,3 +35,10 @@ export enum ServerStatus {
     Open = 2,
     Error = 3
 };
+
+export enum PopupType {
+    Image = 0,
+    Video = 1,
+    Audio = 2,
+    Writing = 3 // TODO Some window gets main caller, other windows get subcall to cover the entire screen? 
+};

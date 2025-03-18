@@ -66,10 +66,12 @@ export const settingsTabs: Array<{ name: string; label: string }> = [
     { name: 'general', label: 'General' },
     { name: 'appearance', label: 'Appearance' },
     { name: 'functions', label: 'Functions' },
+    { name: 'chat', label: 'Chat' },
     { name: 'webcam', label: 'Webcam' },
     { name: 'files', label: 'Files' },
     { name: 'security', label: 'Security' },
     { name: 'server', label: 'Server' },
     { name: 'ngrok', label: 'Ngrok' },
+    { name: 'discord', label: 'Discord' },
     { name: 'about', label: 'About App' }
 ];

@@ -1,8 +1,13 @@
 declare global {
     namespace ControlMe {
         interface SharedFolder {
+            id: string;
+            
             name: string;
             path: string;
+
+            /** Optional array of users who can see the folder */
+            allowedUsers?: Array<string>;
         }
 
         interface Settings {
@@ -67,6 +72,7 @@ declare global {
                 fallbacks?: Array<NgrokFallback>;
             };
 
+            // TODO add these to settings
             discord: {
                 /** Set to true to run discord authentication through a custom application */
                 useCustomApplication: boolean;

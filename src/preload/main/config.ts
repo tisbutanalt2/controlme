@@ -9,10 +9,10 @@ const configFunctions = {
     purgeUsers: () => ipcRenderer.invoke('auth.purgeUsers'),
     deleteUsers: () => ipcRenderer.invoke('auth.deleteUsers'),
 
-    onConfigValueChange: <T = any>(k: string, cb: Listener) => {
+    onConfigValueChange: <T = unknown>(k: string, cb: Listener) => {
         ipcRenderer.send('config.subscribeToChange', k);
 
-        const listener = (e: Electron.IpcRendererEvent, changedKey: string, newValue: T) => {
+        const listener = (_e, changedKey: string, newValue: T) => {
             (changedKey === k) && cb(newValue);
         }
 
@@ -20,7 +20,13 @@ const configFunctions = {
         return () => ipcRenderer.off('config.valueChange', listener);
     },
 
-    openFolder: () => ipcRenderer.send('openFolder')
+    getFunctions: () => ipcRenderer.invoke('functions.get') as Promise<Array<ControlMe.ReducedFunction>>,
+
+    selectFolder: () => ipcRenderer.invoke('folder.select') as Promise<{ path: string; name: string }|undefined>,
+    openFolder: (path: string) => ipcRenderer.send('folder.open', path),
+    
+    openFileFolder: () => ipcRenderer.send('folder.openDefaultFiles'),
+    openMediaFolder: () => ipcRenderer.send('folder.openDefaultMedia')
 };
 
 export default configFunctions;

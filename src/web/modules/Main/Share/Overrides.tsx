@@ -14,35 +14,39 @@ import RemoveIcon from '@muii/Remove';
 
 export const Override: FC<{
     label: string;
+    description?: string;
     allow?: boolean;
     onChange: (v?: boolean) => void;
-}> = props => <UI.Stack mt="12px" gap="12px">
-    <ToggleButtonGroup
-        value={props.allow ? 'allow' : (props.allow === false ? 'disallow' : 'unset')}
-        exclusive
-        onChange={(_e, v: string) => props.onChange(
-            v === 'allow' ?
-                true :
-            v === 'disallow' ?
-                false :
-            undefined
-        )}
-    >
-        <ToggleButton color="error" value="disallow">
-            <CloseIcon color="error" />
-        </ToggleButton>
+}> = props => <>
+    <UI.Stack mt="12px" gap="12px">
+        <ToggleButtonGroup
+            value={props.allow ? 'allow' : (props.allow === false ? 'disallow' : 'unset')}
+            exclusive
+            onChange={(_e, v: string) => props.onChange(
+                v === 'allow' ?
+                    true :
+                v === 'disallow' ?
+                    false :
+                undefined
+            )}
+        >
+            <ToggleButton color="error" value="disallow">
+                <CloseIcon color="error" />
+            </ToggleButton>
 
-        <ToggleButton value="unset">
-            <RemoveIcon />
-        </ToggleButton>
+            <ToggleButton value="unset">
+                <RemoveIcon />
+            </ToggleButton>
 
-        <ToggleButton color="success" value="allow">
-            <CheckIcon color="success" />
-        </ToggleButton>
-    </ToggleButtonGroup>
+            <ToggleButton color="success" value="allow">
+                <CheckIcon color="success" />
+            </ToggleButton>
+        </ToggleButtonGroup>
 
-    <div>{props.label}</div>
-</UI.Stack>
+        <div>{props.label}</div>
+    </UI.Stack>
+    {props.description && <UI.MUI.HelperText>{props.description}</UI.MUI.HelperText>}
+</>
 
 const Overrides = () => {
     const [functions, setFunctions] = useState<Array<ControlMe.ReducedFunction>>([]);

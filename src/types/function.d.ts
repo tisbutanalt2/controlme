@@ -22,7 +22,7 @@ declare global {
             import('enum').FieldType.Boolean |
             import('enum').FieldType.Object |
             import('enum').FieldType.String
-        })
+        });
 
         interface FunctionParamField {
             name: string;
@@ -32,6 +32,9 @@ declare global {
             required?: boolean;
             requiredPermission?: string|Array<string>;
             defaultValue?: unknown;
+
+            /** Optional glob pattern for file types if field is of type File */
+            glob?: string;
         }
 
         interface StoredFunction {
@@ -49,6 +52,7 @@ declare global {
         interface Function {
             /** Unique function name */
             name: string;
+            hidden?: boolean;
 
             /** Additional permission keys used when checking access */
             additionalPermissions?: Array<{ name: string; label?: string }>;
@@ -79,7 +83,7 @@ declare global {
             ) => string|boolean;
     
             /** Function handler */
-            handler: (options: object) => FunctionResult|Promise<FunctionResult>;
+            handler?: (options: object) => FunctionResult|Promise<FunctionResult>;
         }
 
         type ReducedFunction = Omit<ControlMe.Function, 'handler'|'validateArgs'>

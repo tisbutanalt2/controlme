@@ -9,13 +9,11 @@ body {
     margin: 0;
     padding: 0;
 
-    min-height: 100vh;
-
     color: var(--c-text);
     font-family: var(--text-font);
 
     &.module-main {
-        overflow: auto hidden;
+        overflow: hidden auto;
     }
 
     &:not(.module-notification) {
@@ -53,6 +51,10 @@ a {
 // Code
 code, pre {
     font-family: var(--code-font);
+}
+
+pre.error {
+    color: var(--c-error);
 }
 
 // Scrollbar

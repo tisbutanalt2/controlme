@@ -37,6 +37,7 @@
             "@styles/*": ["src/styles/*"],
             "@utils/*": ["src/utils/*"],
             "@main/*": ["src/main/*"],
+            "@web/*": ["src/server/web/*"],
             "@server/*": ["src/server/*"],
             "@preload/*": ["src/preload/*"],
             "@muim/*": ["node_modules/@mui/material/*"],

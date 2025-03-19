@@ -4,14 +4,19 @@ import context from 'ctx';
 import { UserType } from 'enum';
 import authStore from '@stores/auth';
 
-export default function decodeUserToken(jwt: string): Auth.User|null {
+export default function decodeUserToken(jwt: string): Auth.User|undefined {
     try {
         const decoded = jsonwebtoken.verify(jwt, context.secret) as Auth.JWT;
 
-        if (decoded.t === UserType.Access) return {
-            _key: decoded.k,
-            type: UserType.Access,
-            displayName: decoded.dn
+        if (decoded.t === UserType.Access) {
+            const sharelink = authStore.get(`shareLinks.${decoded.sid}`) as Auth.ShareLink|undefined;
+            
+            return {
+                _key: decoded.k,
+                type: UserType.Access,
+                displayName: decoded.dn,
+                functionOverrides: sharelink?.functionOverrides
+            }
         }
 
         const storedUser = authStore.get(`users.${
@@ -27,10 +32,10 @@ export default function decodeUserToken(jwt: string): Auth.User|null {
             (decoded.exp <= ts) ||
             (decoded.iat !== storedUser.lastLogin) ||
             (storedUser.lastLogout && (storedUser.lastLogout > decoded.iat))
-        ) return null;
+        ) return undefined;
 
         return storedUser;
     } catch {
-        return null;
+        return undefined;
     }
 }

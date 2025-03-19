@@ -24,7 +24,7 @@ ipcMain.handle('share.generate', (_e, props: Omit<Auth.ShareLink, 'id'>) => {
         clipboard.writeText(`${url}?sid=${link.id}`);
 
         displayNotification({
-            title: 'Sharelink generated!',
+            title: 'Share Link Generated!',
             message: 'The link was copied to your clipboard'
         }, true);
     }

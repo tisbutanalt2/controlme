@@ -83,6 +83,9 @@ declare global {
             chat: {
                 /** Displays a notification when a message is sent, unless the chat window is actively focused on */
                 notifyOnMessage: boolean;
+
+                /** Max amount of chat messages to store at once */
+                maxMessageCount?: number;
             }
         }
     }

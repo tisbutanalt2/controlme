@@ -28,12 +28,19 @@ declare global {
             lastLogout?: number;
         } | {
             type: import('enum').UserType.Access;
-        })
+        });
+
+        interface ApprovedUser {
+            _key: string;
+            expiration?: number;
+        }
 
         interface Store {
             secret: string;
 
             users: Record<string, User>;
+            approvedUsers: Record<string, ApprovedUser>;
+
             shareLinks: Record<string, ShareLink>;
         }
 
@@ -52,6 +59,9 @@ declare global {
         } | {
             t: import('enum').UserType.Access;
             
+            /** Share ID */
+            sid: string;
+
             /** Random key */
             k: string;
 

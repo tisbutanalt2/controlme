@@ -15,7 +15,8 @@ export enum FieldType {
     Number = 1,
     Boolean = 2,
     Object = 3,
-    Array = 4
+    Array = 4,
+    File = 5
 };
 
 export enum ShareLinkType {

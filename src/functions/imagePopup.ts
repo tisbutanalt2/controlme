@@ -2,33 +2,46 @@ import context from 'ctx';
 import { DangerLevel, FieldType } from 'enum';
 
 import pickRandom from '@utils/array/pickRandom';
+import { globPatterns } from 'const';
 
 const imagePopup: ControlMe.Function = {
     name: 'imagePopup',
     dangerLevel: DangerLevel.Medium,
 
     title: 'Image Popup',
-    description: 'Displays image popups on any of your screens',
+    description: 'Displays image popups on any of your screens.',
 
     options: [
+        {
+            name: 'maxCount',
+            type: FieldType.Number,
+            label: 'Max popup count',
+            description: 'Sets a max limit on how many popups can be displayed at once.'
+        },
+
         {
             name: 'maxTime',
             type: FieldType.Number,
             label: 'Max popup time',
-            description: 'Sets a max limit (in seconds) for how long a popup can stay on screen'
+            description: 'Sets a max limit (in seconds) for how long a popup can stay on screen.'
         }
     ],
 
     parameters: [
         {
             name: 'src',
-            type: FieldType.String,
-            required: true
+            type: FieldType.File,
+            required: true,
+            glob: globPatterns.image,
+            label: 'Image'
         },
 
         {
-            name: 'clickable',
-            type: FieldType.Boolean
+            name: 'nonClosable',
+            type: FieldType.Boolean,
+            requiredPermission: 'nonClosablePopup',
+            label: 'Non-closable',
+            description: 'Prevents the popup from being closed.'
         }
     ],
 

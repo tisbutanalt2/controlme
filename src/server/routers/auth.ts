@@ -12,13 +12,13 @@ import axios from 'axios';
 
 import getShareLink from '@utils/server/getShareLink';
 import getFunctionAccess from '@utils/server/getFunctionAccess';
+import validateSignup from '@utils/validateSignup';
 
 import requireLoggedIn from '@utils/server/requireLoggedIn';
+import minifyUser from '@utils/minifyUser';
 
 import { UserType } from 'enum';
-import { maxDisplayNameLength } from 'const';
-
-const expirationTime = 60 * 60 * 24 * 3; // 3 days
+import { jwtExpirationTime, maxDisplayNameLength } from 'const';
 
 const login = (
     username: string,
@@ -41,7 +41,7 @@ const login = (
         t: UserType.Login,
         usr: username,
         iat: timestamp,
-        exp: timestamp + expirationTime
+        exp: timestamp + jwtExpirationTime
     } as Auth.JWT, context.secret);
 
     return returnUser ? [jwt, user] : jwt;
@@ -67,17 +67,8 @@ authRouter.post('/auth/signup', (req, res) => {
     if (typeof shareLink === 'string')
         throw shareLink;
 
-    // Username must be minimum 3 chars and only include a-z, 0-9 and underscore
-    if (!/^[a-z0-9_]{3,}$/.test(username))
-        throw 'Username must be minimum 3 characters long, and must only include alphanumerical characters';
-
-    // Username cannot only contain numbers
-    if (/\d+/.test(username))
-        throw 'Username cannot contain only numbers';
-
-    // Password must be >= 5 in length without spaces
-    if (!/^[^\s]{5,}$/.test(password))
-        throw 'Password must be at least 5 characters, without spaces';
+    const validateRes = validateSignup(username, password);
+    if (validateRes !== true) throw (validateRes.username || validateRes.password);
 
     const salt = bcrypt.genSaltSync();
     const hashedPassword = bcrypt.hashSync(password, salt);
@@ -99,9 +90,7 @@ authRouter.post('/auth/signup', (req, res) => {
     if (!jwt) throw 'Failed to log in';
 
     res.cookie('jwt', jwt, { httpOnly: true });
-    res.json({
-        functionOverrides: getFunctionAccess(user.functionOverrides)
-    });
+    res.json(minifyUser(user));
 
     getShareLink(sid, true);
 });
@@ -124,9 +113,7 @@ authRouter.post('/auth/login', (req, res) => {
     const [jwt, user] = pair;
 
     res.cookie('jwt', jwt, { httpOnly: true });
-    res.json({
-        functionOverrides: getFunctionAccess(user.functionOverrides)
-    });
+    res.json(minifyUser(user));
 });
 
 authRouter.post('/auth/logout', requireLoggedIn(false, true), (req, res) => {

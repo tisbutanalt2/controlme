@@ -3,6 +3,8 @@ import type { TabProps } from '@components/Tabs';
 export const isDev = process.env.NODE_ENV === 'development';
 export const appTitle = 'Control Me!';
 
+export const jwtExpirationTime = 60 * 60 * 24 * 3; // 3 days
+
 export const maxDisplayNameLength = 128;
 
 export const mainTabs: Array<TabProps> = [
@@ -75,3 +77,9 @@ export const settingsTabs: Array<{ name: string; label: string }> = [
     { name: 'discord', label: 'Discord' },
     { name: 'about', label: 'About App' }
 ];
+
+export const globPatterns = {
+    image: '*.{jpg,jpeg,png,gif,webp,avif,svg,bmp}',
+    video: '*.{mp4,webm,ogg}',
+    audio: '*.{mp3,wav,ogg,aac,flac,opus,webm,m4a}'
+} as const;

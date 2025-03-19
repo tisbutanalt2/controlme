@@ -1,4 +1,6 @@
 .module-main {
+    min-height: calc(100vh);
+
     &.dark {
         background-image: linear-gradient(to bottom, var(--c-background), 80%, #0f0f0f);
         background-size: cover;
@@ -7,7 +9,7 @@
 
     main {
         margin: 48px;
-        max-width: calc(100% - 96px);    
+        max-width: calc(100% - 96px);
     }
 
     .tabs {
@@ -20,6 +22,7 @@
 
         .side-menu {
             background-color: var(--c-background-2);
+            max-height: calc(100vh - $tabs-height);
         }
 
         .settings-content-wrapper {

@@ -1,22 +1,47 @@
 import { Router, static as expressStatic } from 'express';
+
+import { readFileSync } from 'fs';
 import { join, resolve } from 'path';
 
 import context from 'ctx';
-import authStore from '@stores/auth';
+import configStore from '@stores/config';
+
+import { ShareLinkType, UserType } from 'enum';
+import minifyUser from '@utils/minifyUser';
 
 const webPath = join(__dirname, '..', 'web');
 const web = Router();
 
+const indexPath = join(webPath, 'index.html');
 web.get('/', (req, res) => {
-    // Sign jwt for sharelink here?
-    const shareId = req.query.sid as string|undefined;
-    if (req.query.sid) {
-        
+    if (configStore.get('security.disableAuth')) return res.sendFile(indexPath);
+
+    let data: ControlMe.MinifiedWebData|undefined;
+
+    if (req.shareLink?.type === ShareLinkType.Signup)
+        data = {
+            su: true,
+            sid: req.shareLink.id
+        };
+
+    else if (req.user) {
+        data = {
+            u: minifyUser(req.user)
+        };
     }
 
-    res.sendFile(
-        join(webPath, 'index.html')
-    );
+    let indexContent = readFileSync(indexPath, 'utf-8');
+
+    const title = configStore.get('appearance.title') as string|undefined;
+    if (title) indexContent = indexContent
+        .replace(/<title>[^<]*<\/title>/, `<title>${title}</title>`);
+        
+    if (data)
+        indexContent = indexContent
+            .replace(/(<body[^>]*>)/, `$1<script type="application/json" id="controlme-data">${JSON.stringify(data)}</script>`);
+    
+    res.send(indexContent);
+
 });
 
 web.get('/favicon.ico', (_req, res) => {

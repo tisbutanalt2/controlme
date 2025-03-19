@@ -28,7 +28,7 @@ const Field: FC<UI.FieldProps> = props => {
     }, [props.name, props.onChange]);
 
     const helperId = props.description && `${id}-helper`;
-    const fieldError = errors?.[props.name];
+    const fieldError = props.name && errors?.[props.name];
 
     const fieldProps: UI.FieldBaseProps = {
         id,

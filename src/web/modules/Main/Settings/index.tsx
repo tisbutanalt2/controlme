@@ -28,19 +28,15 @@ const Settings = () => {
     const [settings, setSettings] = useState<ControlMe.Settings>(defaultSettings);
     const [,setLastSettings] = useState<ControlMe.Settings>(defaultSettings);
 
-    const [mounted, setMounted] = useState<boolean>(false);
     const [fetched, setFetched] = useState<boolean>(false);
 
     useEffect(() => {
-        if (mounted || fetched) return;
-        setMounted(true);
-
         window.ipcMain.getConfig().then(cfg => {
             setSettings(cfg);
             setLastSettings(cfg);
             setFetched(true);
         });
-    }, [mounted, fetched]);
+    }, []);
 
     // Check object refs and dynamically update
     useEffect(() => {

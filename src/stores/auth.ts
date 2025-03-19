@@ -1,11 +1,12 @@
 import { app } from 'electron';
 import Store from 'electron-store';
 
-import { rmSync } from 'fs';
+import { renameSync } from 'fs';
 import { join } from 'path';
 
 import log from 'log';
 import sanitizeError from '@utils/sanitizeError';
+import unixTimestamp from '@utils/unixTimestamp';
 
 import { randomBytes } from 'crypto';
 import { ShareLinkType, UserType } from 'enum';
@@ -51,7 +52,8 @@ const createStore = () => new Store<Auth.Store>({
     defaults: {
         secret: randomBytes(32).toString('hex'),
         users: {},
-        shareLinks: {}
+        shareLinks: {},
+        approvedUsers: {}
     },
     schema: {
         secret: { type: 'string' },
@@ -85,6 +87,20 @@ const createStore = () => new Store<Auth.Store>({
                     required: ['type', 'id']
                 }
             }
+        },
+
+        approvedUsers: {
+            type: 'object',
+            patternProperties: {
+                '.*': {
+                    type: 'object',
+                    properties: {
+                        _key: { type: 'string' },
+                        expiration: { type: 'number' }
+                    },
+                    required: ['_key']
+                }
+            }
         }
     }
 });
@@ -93,8 +109,9 @@ let authStore: Store<Auth.Store>;
 try {
     authStore = createStore();
 } catch(err) {
-    log(`Failed to parse auth store: ${sanitizeError(err)}. Deleting...`); // TODO move instead?
-    rmSync(join(app.getPath('userData'), 'auth.json'), { force: true });
+    log(`Failed to parse auth store: ${sanitizeError(err)}. Deleting...`);
+    const userDataPath = app.getPath('userData');
+    renameSync(join(userDataPath, 'auth.json'), join(userDataPath, `auth.backup.${unixTimestamp()}.json`));
     authStore = createStore();
 }
 

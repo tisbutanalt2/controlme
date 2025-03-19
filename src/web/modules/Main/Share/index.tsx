@@ -7,8 +7,8 @@ import Overrides from './Overrides';
 export type ShareForm = Omit<Auth.ShareLink, 'id'|'type'> & { type?: ShareLinkType };
 
 const Share = () => {
-    const [mounted, setMounted] = useState<boolean>();
     const [shareLinks, setSharelinks] = useState<Array<Auth.ShareLink>|undefined>();
+    const [authDisabled, setAuthDisabled] = useState<boolean>(false);
 
     const [expiration, setExpiration] = useState<number|undefined>();
     const [expirationUnit, setExpirationUnit] = useState<
@@ -22,21 +22,67 @@ const Share = () => {
     });
 
     useEffect(() => {
-        if (mounted) return;
-        setMounted(true);
-
         window.ipcMain.getShareLinks().then(setSharelinks);
-        window.ipcMain.onShareLinkDeleted(id => {
+        const cleanupDeleted = window.ipcMain.onShareLinkDeleted(id => {
             setSharelinks(prev => {
                 if (!prev) return prev;
                 return prev.filter(l => l.id !== id);
             })
         });
-    }, [mounted]);
+
+        window.ipcMain.getConfigValue('security.disableAuth').then(v => setAuthDisabled(Boolean(v)));
+        const cleanupChange = window.ipcMain.onConfigValueChange('security.disableAuth', v => setAuthDisabled(Boolean(v)));
+
+        return () => {
+            cleanupDeleted();
+            cleanupChange();
+        }
+    }, []);
 
     const generate = useCallback(() => {
+        const now = Math.floor(Date.now() / 1000);
 
+        const expirationTimeSeconds = expirationUnit === 'never'
+            ? undefined
+            : expirationUnit === 'minutes'
+            ? (expiration ?? 0) * 60
+            : expirationUnit === 'hours'
+            ? (expiration ?? 0) * 60 * 60
+            : (expiration ?? 0) * 60 * 60 * 24;
+
+        window.ipcMain.generateShareLink({
+            type: form.type!,
+            functionOverrides: form.functionOverrides,
+            maxUses: maxUses || undefined,
+            expiration: expirationTimeSeconds ? (now + expirationTimeSeconds) : undefined
+        })
+            .then(link => setSharelinks(prev => {
+                if (!prev) return [link];
+                return [...prev, link];
+            }));
+
+        setForm({
+            functionOverrides: []
+        });
     }, [form, expiration, expirationUnit, maxUses]);
+
+    if (authDisabled) return <main>
+        <h1>Share a link!</h1>
+        <UI.Button
+            color="success"
+            sx={{
+                paddingY: '15px',
+                paddingX: '24px'
+            }}
+            onClick={async () => {
+                const fallback = await window.ipcMain.getConfigValue('server.address');
+                const ngrok = await window.ipcMain.ngrokUrl();
+                let url = ngrok || fallback;
+                if (!/https?:\/\//.test(url)) url = `http://${url}`;
+                window.ipcMain.writeToClipboard(url);
+            }
+        }>Copy Link</UI.Button>
+    </main>
 
     return <main>
         <h1>Share a link!</h1>
@@ -56,7 +102,7 @@ const Share = () => {
                     label="Link type"
                     options={[
                         { label: 'Access', value: String(ShareLinkType.Access) },
-                        { label: 'Login', value: String(ShareLinkType.Signup) },
+                        { label: 'Signup', value: String(ShareLinkType.Signup) },
                         { label: 'Discord', value: String(ShareLinkType.Discord) }
                     ]}
                     onChange={v => setForm(prev => ({
@@ -73,33 +119,8 @@ const Share = () => {
                         paddingY: '15px',
                         paddingX: '24px'
                     }}
-                    onClick={() => {
-                        const now = Math.floor(Date.now() / 1000);
-
-                        const expirationTimeSeconds = expirationUnit === 'never'
-                            ? undefined
-                            : expirationUnit === 'minutes'
-                            ? (expiration ?? 0) * 60
-                            : expirationUnit === 'hours'
-                            ? (expiration ?? 0) * 60 * 60
-                            : (expiration ?? 0) * 60 * 60 * 24;
-
-                        window.ipcMain.generateShareLink({
-                            type: form.type!,
-                            functionOverrides: form.functionOverrides,
-                            maxUses: maxUses || undefined,
-                            expiration: expirationTimeSeconds ? (now + expirationTimeSeconds) : undefined
-                        })
-                            .then(link => setSharelinks(prev => {
-                                if (!prev) return [link];
-                                return [...prev, link];
-                            }));
-
-                        setForm({
-                            functionOverrides: []
-                        });
-                    }}
-                >Create and Copy</UI.Button>}
+                    onClick={generate}
+                >Create and Copy Link</UI.Button>}
             </UI.Stack>
 
             {form.type !== undefined && <>

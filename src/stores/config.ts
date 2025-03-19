@@ -1,13 +1,14 @@
 import { app } from 'electron';
 import Store from 'electron-store';
 
-import { rmSync } from 'fs';
+import { renameSync } from 'fs';
 import { join } from 'path';
 
 import { defaultSettings } from 'const';
 
 import log from 'log';
 import sanitizeError from '@utils/sanitizeError';
+import unixTimestamp from '@utils/unixTimestamp';
 
 const sharedFolder = {
     type: 'object',
@@ -171,7 +172,8 @@ const createStore = () => new Store<ControlMe.Settings>({
         chat: {
             type: 'object',
             properties: {
-                notifyOnMessage: { type: 'boolean' }
+                notifyOnMessage: { type: 'boolean' },
+                maxMessageCount: { type: 'number' }
             },
             required: [
                 'notifyOnMessage'
@@ -185,7 +187,8 @@ try {
     configStore = createStore();
 } catch(err) {
     log(`Failed to parse config store: ${sanitizeError(err)}. Deleting...`);
-    rmSync(join(app.getPath('userData'), 'config.json'), { force: true });
+    const userDataPath = app.getPath('userData');
+    renameSync(join(userDataPath, 'config.json'), join(userDataPath, `config.backup.${unixTimestamp()}.json`));
     configStore = createStore();
 }
 

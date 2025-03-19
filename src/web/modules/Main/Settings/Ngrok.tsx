@@ -118,27 +118,25 @@ const NgrokSettings = () => {
         <UI.Field
             disabled={ngrokStatus !== ServerStatus.Closed}
             name="authToken"
-            helperId="settings-ngrok-authToken-helper"
             type="text"
             password
             label="Auth token"
             sx={{ mt: '12px', width: '300px' }}
         />
 
-        <UI.MUI.HelperText id="settings-ngrok-authToken-helper">
+        <UI.MUI.HelperText>
             Your Ngrok <a href="https://dashboard.ngrok.com/get-started/your-authtoken" target="_blank" title="Go to Ngrok Auth Token">Authentication Token</a>
         </UI.MUI.HelperText>
 
         <UI.Field
             disabled={ngrokStatus !== ServerStatus.Closed}
             name="domain"
-            helperId="settings-ngrok-authToken-helper"
             type="text"
             label="Domain"
             sx={{ mt: '8px', width: '300px' }}
         />
 
-        <UI.MUI.HelperText id="settings-ngrok-domain-helper">
+        <UI.MUI.HelperText>
             Set this if you've reserver an <a href="https://dashboard.ngrok.com/cloud-edge/domains" target="_blank" title="Go to Ngrok Domains">Ngrok Domain</a>
         </UI.MUI.HelperText>
 

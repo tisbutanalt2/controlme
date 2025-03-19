@@ -10,7 +10,7 @@ const Menu = () => {
     const [index, setIndex] = useMenuContext();
 
     return <div className="side-menu">
-        <MenuList sx={{ height: 'calc(100vh - 48px)', pt: 0 }}>
+        <MenuList sx={{ height: 'calc(100vh - 48px)', py: 0 }}>
             {settingsTabs.map((tab, i) => <MenuItem
                 selected={index === i}
                 key={i}

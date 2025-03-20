@@ -12,6 +12,8 @@ declare global {
             type: import('enum').FieldType;
             label?: string;
             description?: string;
+            dangerLevel?: import('enum').DangerLevel;
+            defaultValue?: unknown;
         } & ({
             type: import('enum').FieldType.Number;
             min?: number;
@@ -42,17 +44,23 @@ declare global {
             options?: Record<string, unknown>;
         }
     
-        type FunctionResult = string | true | {
+        interface FunctionResultObject {
             success: boolean;
-            isError?: boolean;
             errorMessage?: string;
             [k: string]: unknown;
-        };
+        }
 
-        interface Function {
+        type FunctionResult = string | undefined | true | FunctionResultObject;
+
+        interface Function<Props = RSAny, Options = RSAny> {
             /** Unique function name */
             name: string;
+
+            /** True if the function shouldn't be considered callable */
             hidden?: boolean;
+
+            /** True if the function is rendered by a custom react component */
+            custom?: boolean;
 
             /** Additional permission keys used when checking access */
             additionalPermissions?: Array<{ name: string; label?: string }>;
@@ -77,13 +85,14 @@ declare global {
 
             /** Optional function to validate passed args. Return a string to show an error. */
             validateArgs?: (
-                parameters: Record<string, unknown>,
+                parameters: Props,
+                options: Options,
                 permissions: Set<string>,
                 user: Auth.User
             ) => string|boolean;
     
             /** Function handler */
-            handler?: (options: object) => FunctionResult|Promise<FunctionResult>;
+            handler?: (parameters: Props, options: Options, user: Auth.User) => FunctionResult|Promise<FunctionResult>;
         }
 
         type ReducedFunction = Omit<ControlMe.Function, 'handler'|'validateArgs'>

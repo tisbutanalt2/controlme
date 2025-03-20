@@ -5,6 +5,7 @@ import WebProviders from '@providers/Web';
 import DataContext from './Data';
 import ConnectionContext, { type Connection } from './Connection';
 
+import Main from './Main';
 import Loading from './Loading';
 import Connect from './Connect';
 import Login from './Login';
@@ -51,7 +52,7 @@ const Sub = () => {
     return <ConnectionContext.Provider value={[connection, setConnection]}>
         <DataContext.Provider value={[data, setData]}>
             <Routes>
-                <Route path="/" element={<>Actual functions coming soon</>} />
+                <Route path="/" element={<Main />} />
                 <Route path="/loading" element={<Loading />} />
                 <Route path="/connect" element={<Connect />} />
                 <Route path="/login" element={<Login />} />

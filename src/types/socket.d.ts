@@ -5,12 +5,13 @@ declare global {
             type Callback<CB extends ((...args: Array<unknown>) => void) = (...args: Array<unknown>) => void> = (err?: string|false|null,...args: Parameters<CB>) => void;
     
             interface ServerEvents {
-                invokeFunction: (name: string, props?: RSAny, res?: Callback, rej?: (err?: string) => void) => void;
+                functions: (cb: (f: Record<string, boolean>) => void) => void;
+                invokeFunction: (name: string, props?: RSAny, res?: (res: ControlMe.FunctionResultObject & { success: true }) => void, rej?: (err?: string) => void) => void;
             }
     
             interface ClientEvents {
                 approved: () => void;
-                rejected: (reason?: string) => void;
+                rejected: (reason: string) => void;
             }
     
             interface InternalEvents {

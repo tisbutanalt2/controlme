@@ -42,29 +42,34 @@ export default function setupSockets(server: Server) {
         }
 
         socket.data.user = user;
+        next();
     });
 
     // Check if approval is needed before sending to handleSocket
     io.on('connection', socket => {
         if (!configStore.get('security.approveAuth')) {
-            socket.emit('approved');
-            return handleSocket(socket);
+            handleSocket(socket);
+            return socket.emit('approved');
         }
 
         const state = authStore.get(`approvedUsers.${socket.data.user._key}`) as Auth.ApprovedUser;
 
-        let shouldApprove = configStore.get('security.alwaysApproveAuth');
-        if (!shouldApprove && state) {
+        let shouldApprove = true;
+        if (!configStore.get('security.alwaysApproveAuth') && state) {
             const ts = Math.floor(Date.now() / 1000);
             if (state.expiration && (ts >= state.expiration)) {
                 shouldApprove = true;
                 authStore.delete(`approvedUsers.${socket.data.user._key}` as keyof Auth.Store);
             }
+
+            else shouldApprove = false;
         }
 
+        else authStore.delete(`approvedUsers.${socket.data.user._key}` as keyof Auth.Store);
+
         if (!shouldApprove) {
-            socket.emit('approved');
-            return handleSocket(socket);
+            handleSocket(socket);
+            return socket.emit('approved');
         }
 
         const imageSrc = socket.data.user.type === UserType.Discord
@@ -76,18 +81,24 @@ export default function setupSockets(server: Server) {
             yesNo: true,
             noClose: true,
             title: 'Connection request',
-            timeout: 120_000
+            timeout: 120_000,
+            message: `${socket.data.user.displayName} (${socket.data.user._key}) is requesting access`
         }).then(approved => {
             if (!approved) {
                 socket.emit('rejected', (approved === false)
                     ? 'Access was denied'
                     : 'Approval timed out'
                 );
-                return socket.disconnect();
+                return socket.disconnect(true);
             }
 
-            socket.emit('approved');
+            !configStore.get('security.alwaysApproveAuth') &&
+            authStore.set(`approvedUsers.${socket.data.user._key}` as keyof Auth.Store, {
+                _key: socket.data.user._key
+            } as Auth.ApprovedUser);
+
             handleSocket(socket);
+            return socket.emit('approved');
         });
     });
 

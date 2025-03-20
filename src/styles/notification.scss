@@ -9,6 +9,10 @@
             margin-top: 28px;
         }
 
+        &:not(:has(.content img)) .top {
+            padding-top: 8px;
+        }
+
         display: flex;
         flex-direction: column;
         align-items: flex-start;

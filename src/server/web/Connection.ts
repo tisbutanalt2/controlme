@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react';
 
 export interface Connection {
+    availableFunctions: Record<string, boolean>;
     socket: ControlMe.ClientSocket;
 }
 

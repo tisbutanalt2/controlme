@@ -60,13 +60,13 @@ const Base = forwardRef<HTMLDivElement, Props>((props, ref) => {
             <MUI.Button
                 variant="contained"
                 color="info"
-                onClick={() => close(false)}
+                onClick={() => close(true)}
             >YES</MUI.Button>
 
             <MUI.Button
                 variant="contained"
                 color="error"
-                onClick={() => close(true)}
+                onClick={() => close(false)}
             >NO</MUI.Button>
         </div>}
     </SnackbarContent>

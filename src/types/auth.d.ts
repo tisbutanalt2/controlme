@@ -4,7 +4,7 @@ declare global {
             /** Will be either the username, Discord user ID, or a randomly generated UUID */
             _key: string;
             type: import('enum').UserType;
-            functionOverrides?: Array<ControlMe.FunctionOverride>;
+            functionOverrides?: ControlMe.FunctionOverrides;
 
             /** The user's displayname in the app */
             displayName: string;
@@ -71,6 +71,14 @@ declare global {
             t: import('enum').UserType.Discord
             id: string;
         });
+
+        interface DiscordUser {
+            id: string;
+            username: string;
+
+            global_name: string;
+            avatar: string;
+        }
     }
 }
 

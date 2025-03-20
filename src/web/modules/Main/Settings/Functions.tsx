@@ -76,6 +76,7 @@ const FunctionSettings = () => {
                                     type="text"
                                     label={opt.label ?? opt.name}
                                     value={String(value)}
+                                    defaultValue={opt.defaultValue as string}
                                     onChange={v => setOption(f.name, opt.name, v)}
                                 />
                                 break;
@@ -84,6 +85,7 @@ const FunctionSettings = () => {
                                     type="number"
                                     label={opt.label ?? opt.name}
                                     value={value as number|undefined}
+                                    defaultValue={opt.defaultValue as number}
                                     onChange={v => setOption(f.name, opt.name, v)}
                                     min={opt.min}
                                     max={opt.max}
@@ -95,6 +97,7 @@ const FunctionSettings = () => {
                                     type="checkbox"
                                     label={opt.label ?? opt.name}
                                     value={Boolean(value)}
+                                    defaultValue={opt.defaultValue as boolean}
                                     onChange={v => setOption(f.name, opt.name, v)}
                                 />
                                 break;

@@ -174,6 +174,18 @@ const NgrokSettings = () => {
             >Retry</UI.Button>
         </UI.Stack>
 
+        {ngrokStatus === ServerStatus.Open && ngrokUrl && <UI.MUI.HelperText>
+            Available at <a href={ngrokUrl} target="_blank">{ngrokUrl}</a>    
+        </UI.MUI.HelperText>}
+
+        {ngrokStatus === ServerStatus.Error && <>
+            <UI.MUI.HelperText sx={{ color: 'var(--c-error)' }}>
+                There was an error connecting to Ngrok
+            </UI.MUI.HelperText>
+
+            {ngrokError && <pre style={{ color: 'var(--c-error)' }}>{ngrokError}</pre>}
+        </>}
+
         <h2>Fallback Accounts</h2>
         <UI.MUI.HelperText sx={{ mb: '16px' }}>
             Ngrok comes with a monthly data limit. You may add multiple auth tokens and domains here, and the app will automatically
@@ -196,18 +208,6 @@ const NgrokSettings = () => {
         >
             <AddIcon />
         </UI.Button>
-
-        {ngrokStatus === ServerStatus.Open && ngrokUrl && <UI.MUI.HelperText>
-            Available at <a href={ngrokUrl} target="_blank">{ngrokUrl}</a>    
-        </UI.MUI.HelperText>}
-
-        {ngrokStatus === ServerStatus.Error && <>
-            <UI.MUI.HelperText sx={{ color: 'var(--c-error)' }}>
-                There was an error connecting to Ngrok
-            </UI.MUI.HelperText>
-
-            {ngrokError && <pre style={{ color: 'var(--c-error)' }}>{ngrokError}</pre>}
-        </>}
     </TabForm>
 }
 

@@ -1,5 +1,8 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+
 import { useConnectionContext } from './Connection';
+import { io } from 'socket.io-client';
 
 import Backdrop from '@muim/Backdrop';
 import Progress from '@muim/CircularProgress';
@@ -7,10 +10,39 @@ import Progress from '@muim/CircularProgress';
 import UI from '@components/ui';
 
 const Connect = () => {
-    const [connection, setConnection] = useConnectionContext();
+    const [mounted, setMounted] = useState(false);
+    const [, setConnection] = useConnectionContext();
     const navigate = useNavigate();
 
-    // TODO add socket connection here
+    useEffect(() => {
+        if (mounted) return;
+        setMounted(true);
+
+        const socket = io({
+            path: '/socket',
+            addTrailingSlash: false,
+            forceNew: true,
+            reconnection: false
+        }) as ControlMe.ClientSocket;
+
+        socket.on('approved', () => {
+            socket.emit('functions', availableFunctions => {
+                setConnection({ socket, availableFunctions });
+                navigate('/');
+            });
+        });
+
+        let rejected = false;
+        socket.on('rejected', reason => {
+            rejected = true;
+            throw new Error(reason);
+        });
+
+        socket.on('disconnect', () => {
+            if (rejected) return;
+            throw new Error(`Socket disconnected`);
+        })
+    }, [mounted, navigate]);
 
     return <Backdrop open>
         <UI.Stack className="connecting" direction="column" alignItems="center">

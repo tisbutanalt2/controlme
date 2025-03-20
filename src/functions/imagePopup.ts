@@ -6,7 +6,7 @@ import { globPatterns } from 'const';
 
 const imagePopup: ControlMe.Function = {
     name: 'imagePopup',
-    dangerLevel: DangerLevel.Medium,
+    dangerLevel: DangerLevel.Low,
 
     title: 'Image Popup',
     description: 'Displays image popups on any of your screens.',
@@ -16,14 +16,16 @@ const imagePopup: ControlMe.Function = {
             name: 'maxCount',
             type: FieldType.Number,
             label: 'Max popup count',
-            description: 'Sets a max limit on how many popups can be displayed at once.'
+            description: 'Sets a max limit on how many image popups can be displayed at once.',
+            defaultValue: 20
         },
 
         {
             name: 'maxTime',
             type: FieldType.Number,
             label: 'Max popup time',
-            description: 'Sets a max limit (in seconds) for how long a popup can stay on screen.'
+            description: 'Sets a max limit (in seconds) for how long an image popup can stay on screen.',
+            defaultValue: 30
         }
     ],
 

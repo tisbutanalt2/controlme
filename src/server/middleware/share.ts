@@ -13,6 +13,8 @@ import { jwtExpirationTime } from 'const';
 const shareMiddleware = Router();
 
 shareMiddleware.use('/', (req, res, next) => {
+    if (req.user) return next();
+    
     const sid = req.query.sid as string|undefined;
     if (!sid) return next();
 
@@ -22,7 +24,12 @@ shareMiddleware.use('/', (req, res, next) => {
 
     switch(shareLink.type) {
         case ShareLinkType.Discord:
-            return res.redirect(`/auth/discord?sid=${sid}`) // TODO change this
+            if (req.path === '/auth/discord') {
+                req.shareLink = shareLink;
+                return next();
+            }
+
+            return res.redirect(`/auth/discord?sid=${sid}`);
 
         case ShareLinkType.Access:
             let k = `Anon_${randomUUID()}`;

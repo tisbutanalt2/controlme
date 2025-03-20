@@ -12,7 +12,7 @@ const warningColor = '\x1b[33m';
 const errorColor = '\x1b[31m';
 
 let writing = false;
-export default function log(msg: any, logType: 'info'|'warning'|'error' = 'info') {
+export default function log(msg: any, logType: 'info'|'warning'|'error' = 'info', save: boolean = true) {
     logType === 'error' && (msg = sanitizeError(msg));
     
     const col = logType === 'info'
@@ -22,7 +22,7 @@ export default function log(msg: any, logType: 'info'|'warning'|'error' = 'info'
         : errorColor;
 
     console.log(`${col}[${logType.toUpperCase()}]${resetColor}: ${String(msg)}`);
-    if (isDev) return;
+    if (isDev || !save) return;
 
     if (writing) return console.warn('The previous message could not be stored in the log, due to the file already being written to.');
     writing = true;

@@ -8,7 +8,11 @@ import configStore from '@stores/config';
 import { randomUUID } from 'crypto';
 
 ipcMain.handle('share.generate', (_e, props: Omit<Auth.ShareLink, 'id'>) => {
-    const id = randomUUID();
+    let id = randomUUID();
+    while (authStore.has(id)) {
+        id = randomUUID();
+    }
+
     const link: Auth.ShareLink = {
         id,
         ...props

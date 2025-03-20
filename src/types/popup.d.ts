@@ -8,6 +8,9 @@ declare global {
 
             /** Whether or not the popup can be closed manually. Defaults to true. If audio: Displays an icon to click to stop it */
             closable?: boolean;
+
+            /** True if the popup was called to a different window */
+            isSub?: boolean;
         } & ({
             type: import('enum').PopupType.Image;
             src: string;
@@ -35,6 +38,8 @@ declare global {
         } | {
             type: import('enum').PopupType.Writing;
             prompt: string;
+            message?: string;
+            blackScreen?: boolean;
         });
     }
 }

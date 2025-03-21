@@ -35,8 +35,13 @@ declare global {
             requiredPermission?: string|Array<string>;
             defaultValue?: unknown;
 
+            sx?: import('@muim/styles').SxProps;
+
             /** Optional glob pattern for file types if field is of type File */
             glob?: string;
+
+            /** Allows text fields to write across multiple lines */
+            multiline?: boolean;
         }
 
         interface StoredFunction {
@@ -106,7 +111,8 @@ declare global {
             'dangerLevel' |
             'defaultEnabled' |
             'warning' |
-            'warnOnFalse'
+            'warnOnFalse' |
+            'userDescription'
         >;
     }
 }

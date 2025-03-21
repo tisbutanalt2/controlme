@@ -21,7 +21,7 @@ const WritingPrompt: FC<import('.').PopupProps & { type: import('enum').PopupTyp
         {props.isSub ? (props.message ? <h2 className="message">{props.message}</h2> : null) : <div className="content">
             {props.message && <h2 className="message">{props.message}</h2>}
 
-            <UI.MUI.HelperText>{props.prompt}</UI.MUI.HelperText>
+            <UI.MUI.HelperText sx={{ whiteSpace: 'pre-line' }}>{props.prompt}</UI.MUI.HelperText>
 
             <UI.MUI.TextField
                 value={input}

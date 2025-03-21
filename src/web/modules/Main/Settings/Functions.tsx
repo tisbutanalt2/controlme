@@ -10,7 +10,7 @@ import Switch from '@appui/Field/Switch';
 const FunctionSettings = () => {
     const [settings, setSettings] = useSettingsContext();
 
-    const [functions, setFunctions] = useState<Array<ControlMe.ReducedFunction>>([]);
+    const [functions, setFunctions] = useState<Array<Omit<ControlMe.Function, 'handler'|'validateArgs'>>>([]);
     const [mounted, setMounted] = useState<boolean>(false);
 
     useEffect(() => {
@@ -86,6 +86,7 @@ const FunctionSettings = () => {
                                     label={opt.label ?? opt.name}
                                     value={value as number|undefined}
                                     defaultValue={opt.defaultValue as number}
+                                    allowEmpty
                                     onChange={v => setOption(f.name, opt.name, v)}
                                     min={opt.min}
                                     max={opt.max}

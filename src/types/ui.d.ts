@@ -25,6 +25,7 @@ declare global {
             defaultValue?: string;
 
             password?: boolean;
+            multiline?: boolean;
 
             onChange?(v: string): void;
         }

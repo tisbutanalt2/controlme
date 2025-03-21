@@ -15,10 +15,13 @@ const sharedFolder = {
     properties: {
         name: { type: 'string' },
         path: { type: 'string' },
-        id: { type: 'string' }
+        id: { type: 'string' },
+        allowedUsers: {
+            type: 'array',
+            items: { type: 'string' }
+        }
     },
-    required: ['path', 'id'],
-    additionalProperties: false
+    required: ['path', 'id']
 } as const;
 
 const createStore = () => new Store<ControlMe.Settings>({

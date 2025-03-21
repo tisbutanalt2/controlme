@@ -21,6 +21,12 @@ import FormHelperText from '@muim/FormHelperText';
 import Divider from '@muim/Divider';
 import MenuItem from '@muim/MenuItem';
 
+import Dialog from '@muim/Dialog';
+import DialogTitle from '@muim/DialogTitle';
+import DialogActions from '@muim/DialogActions';
+import DialogContent from '@muim/DialogContent';
+import DialogContentText from '@muim/DialogContentText';
+
 /** Exported MUI components used in the solution */
 const MUI = {
     Button,
@@ -44,7 +50,13 @@ const MUI = {
     HelperText: FormHelperText,
 
     Divider,
-    MenuItem
+    MenuItem,
+
+    Dialog,
+    DialogTitle,
+    DialogActions,
+    DialogContent,
+    DialogContentText
 };
 
 export default MUI;

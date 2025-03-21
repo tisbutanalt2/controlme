@@ -67,13 +67,21 @@ const writingPrompt: ControlMe.Function<Props, Options> = {
             type: FieldType.String,
             label: 'Prompt',
             description: 'The prompt to display on screen.',
-            required: true
+            required: true,
+            multiline: true,
+            sx: { width: '100%' }
         }
     ],
 
     validateArgs(props, options) {
-        if (!options.allowImpossible && !/^[a-z0-9\.,!\?\(\)="' ]*$/i.test(props.prompt))
-            return 'This prompt is not allowed, as it may be impossible to write';
+        if (!options.allowImpossible) {
+            if (!/^[a-z0-9\.,!\?\(\)="'\/#@ \n]*$/im.test(props.prompt))
+                return 'This prompt is not allowed, as it may be impossible to write';
+
+            const linebreakCount = Array.from(props.prompt.matchAll(/\n/g))?.length;
+            if (linebreakCount > 20)
+                return 'This prompt is not allowed, as it has too many line breaks';
+        }
 
         return true;
     },

@@ -21,6 +21,7 @@ const TextField: FC<UI.TextFieldProps & UI.FieldBaseProps> = props => {
                 value={String((props.value ?? form[props.name]) || '')}
                 placeholder={props.placeholder}
                 aria-describedby={props.helperId}
+                multiline={props.multiline}
                 onChange={e => props.onChange?.(e.currentTarget.value || '')}
             />
         </MUI.FormControl>

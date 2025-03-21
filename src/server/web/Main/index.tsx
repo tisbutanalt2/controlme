@@ -8,7 +8,7 @@ import Functions from './Functions';
 
 const Main = () => {
     const connection = useConnection();
-    const [tab, setTab] = useState<string>('');
+    const [tab, setTab] = useState<string>('functions');
 
     const list = useMemo(() => {
         const arr: Array<{ label: string; value: string }> = [

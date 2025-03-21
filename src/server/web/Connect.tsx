@@ -26,8 +26,11 @@ const Connect = () => {
         }) as ControlMe.ClientSocket;
 
         socket.on('approved', () => {
-            socket.emit('functions', availableFunctions => {
-                setConnection({ socket, availableFunctions });
+            socket.emit('functions', functions => {
+                const availableFunctions = new Set<string>();
+                functions.forEach(func => availableFunctions.add(func.name));
+
+                setConnection({ socket, functions, availableFunctions });
                 navigate('/');
             });
         });

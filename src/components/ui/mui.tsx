@@ -1,6 +1,8 @@
 import Button from './Button';
 import Stack from './Stack';
 
+import Card from '@muim/Card';
+
 import IconButton from '@muim/IconButton';
 
 import FormControl from '@muim/FormControl';
@@ -23,6 +25,8 @@ import MenuItem from '@muim/MenuItem';
 const MUI = {
     Button,
     Stack,
+
+    Card,
 
     IconButton,
 

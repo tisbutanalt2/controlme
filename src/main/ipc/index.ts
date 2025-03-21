@@ -10,6 +10,7 @@ import './auth';
 import './server';
 import './ngrok';
 import './notification';
+import './popup';
 import './functions';
 
 ipcMain.handle('version', () => context.version);

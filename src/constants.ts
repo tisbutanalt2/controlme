@@ -27,7 +27,11 @@ export const defaultSettings: ControlMe.Settings = {
         darkTheme: true
     },
 
-    functions: {},
+    functions: {
+        chat: {
+            enabled: true
+        }
+    },
 
     files: {
         mediaFolders: [],

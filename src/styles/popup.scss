@@ -1,0 +1,26 @@
+.writing-prompt {
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    &.black-screen {
+        background-color: black;
+    }
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &.sub .message {
+        text-align: center;
+        font-size: 128px;
+    }
+
+    .content {
+        padding: 32px 48px;
+        border-radius: 24px;
+        background-color: var(--c-background-2);
+    }
+}

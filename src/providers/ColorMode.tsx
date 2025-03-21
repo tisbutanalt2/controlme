@@ -3,7 +3,7 @@ import { ThemeProvider, createTheme } from '@muim/styles';
 
 import ColorModeContext from '@context/ColorMode';
 
-const ColorModeProvider: FC<{ noIpc?: boolean }> = ({ children, noIpc }) => {
+const ColorModeProvider: FC<{ noIpc?: boolean; noSet?: boolean }> = ({ children, noIpc, noSet }) => {
     const [colorMode, setColorMode] = useState<ColorMode>('dark');
 
     const [mounted, setMounted] = useState<boolean>(false);
@@ -17,13 +17,13 @@ const ColorModeProvider: FC<{ noIpc?: boolean }> = ({ children, noIpc }) => {
 
     const getStoredMode = useCallback(() => {
         if (noIpc) return Promise.resolve(localStorage.getItem('theme') !== 'light');
-        return window.ipcMain.getConfigValue('appearance.darkTheme');
+        return window.ipcShared.getConfigValue('appearance.darkTheme');
     }, [noIpc]);
 
     const setStoredMode = useCallback(() => {
-        if (noIpc) return localStorage.setItem('theme', colorMode);
-        window.ipcMain.setConfigValue('appearance.darkTheme', colorMode === 'dark');
-    }, [noIpc, colorMode]);
+        if (noIpc) return !noSet && localStorage.setItem('theme', colorMode);
+        !noSet && window.ipcMain.setConfigValue('appearance.darkTheme', colorMode === 'dark');
+    }, [noIpc, noSet, colorMode]);
 
     useEffect(() => {
         if (!mounted && !valueFetched) {

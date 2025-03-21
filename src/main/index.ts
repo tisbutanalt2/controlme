@@ -1,6 +1,9 @@
 import { app, dialog, globalShortcut } from 'electron';
-import { existsSync, mkdirSync } from 'fs';
 
+import { autoUpdater } from 'electron-updater';
+autoUpdater.autoDownload = false;
+
+import { existsSync, mkdirSync } from 'fs';
 import AutoLaunch from 'auto-launch';
 
 import context from 'ctx';
@@ -85,3 +88,31 @@ app.on('ready', async () => {
 
     log(`Running ${isDev ? 'electron' : 'app'} version ${app.getVersion()}`);
 });
+
+// Auto update
+if (!isDev) {
+    autoUpdater.on('update-available', info => {
+        log(`Update available: ${info.version}`);
+        dialog.showMessageBox({
+            type: 'question',
+            title: 'Update Available',
+            message: `A new version (${info.version}) is available! Do you want to download it?`,
+            buttons: ['Download', 'Ignore']
+        }).then(res => {
+            if (res.response === 0)
+                autoUpdater.downloadUpdate();
+        })
+    });
+    
+    autoUpdater.on('update-downloaded', info => {
+        log(`Update downloaded: ${info.version}`);
+    
+        dialog.showMessageBox({
+            type: 'question',
+            title: 'Update Ready',
+            message: 'The update has been downloaded. Restart the app to install it now?'
+        }).then(res => {
+            if (res.response === 0) autoUpdater.quitAndInstall()
+        })
+    });
+}

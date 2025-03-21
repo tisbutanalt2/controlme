@@ -12,3 +12,33 @@ main {
 .connecting {
     user-select: none;
 }
+
+$footer-height: 36px;
+$footer-pt: 4px;
+$footer-pb: 8px;
+.main {
+    min-height: calc(100vh - $footer-height - $footer-pt - $footer-pb);
+    overflow: hidden auto;
+}
+
+footer {
+    user-select: none;
+
+    width: 100%;
+    height: $footer-height;
+    padding-top: $footer-pt;
+    padding-bottom: $footer-pb;
+    background-color: var(--c-background-2);
+
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.function-button {
+    min-height: 160px;
+    &.function-active, &:hover, &:active {
+        box-shadow: 0 4px 4px var(--c-text);
+    }
+}

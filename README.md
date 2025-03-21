@@ -8,37 +8,44 @@ A fun app made with Electron to let others control your PC in various (mostly) s
 
 Features are marked with a checkbox which determines whether it has been implemented or not:
 
-- [x] Discord authentication (requires third party server)
-- [x] Change wallpaper
-- [x] Image popups
-- [ ] Video popups*
-- [ ] Writing prompts*
-- [ ] Play audio*
-- [x] Open URLs
-- [x] Access webcam
-- [x] Take screenshots
-- [x] Upload files and media
-- [x] Autorun executable files
-- [x] Run terminal commands 
+- [x] User authentication (anonymous, login, discord)
+- [x] Ngrok tunneling (no need to port forward)
+- [ ] Change wallpaper
+- [ ] Image popups
+- [ ] Video popups
+- [ ] Writing prompts
+- [ ] Play audio
+- [ ] Open URLs
+- [ ] Webcam photo
+- [ ] Take screenshots
+- [ ] Upload files
+- [ ] Automatically run exe-files
+- [ ] Automatically extract zip-files
+- [ ] Run terminal commands
 
 ## Installation
 The app is shipped with an installer. Download it and run it.
 
+When updates are released, simply download the new installer and run it.
+The installer will overwrite the previous version of the app.
+
+**Please follow the [Tutorial](./tutorial.md) once the app is installed**
+
 ### Networking
 The majority of people either can't, or don't know how to forward a port in their network.
 
-Because of this, the app has built in support for [NGROK](https://ngrok.com).
+Because of this, the app has built in support for [Ngrok tunneling](https://ngrok.com).
 
-1. [Create your NGROK account](https://dashboard.ngrok.com/signup)
-2. [Copy your auth token](https://dashboard.ngrok.com/get-started/your-authtoken)
-3. Paste it in Settings > NGROK
-4. Click Start, and a url to your NGROK tunnel should be displayed
+1. [Create your Ngrok account](https://dashboard.ngrok.com/signup)
+2. [Copy your Authentication Token](https://dashboard.ngrok.com/get-started/your-authtoken)
+3. Paste it in Settings > Ngrok
+4. Click Start, and a url to your Ngrok tunnel should be displayed
 
 **The port in which the server is hosted on can be controlled from Settings > Server.** If the number 0 is inserted, a random available port will be picked.
 
 ## Contributing
 [Bun](https://bun.sh) was used to work on this, hence why each script in [package.json](./package.json) uses `bun` instead of regular [`node`](https://nodejs.org).
-If you still wish to use NodeJS, check the [Using NodeJS](#using-nodejs) section.
+NodeJS is however still compatible.
 
 ### 1. Clone the repository, and install the required packages
 ```sh
@@ -61,21 +68,6 @@ bun start # or npm run node:start
 ### 3. Building the app:
 ```sh
 bun run build # or npm run node:build
-```
-
-### Using NodeJS
-The project has been tested with Node V20.9.0.
-
-Since Bun has built in ENV parsing, you'll need to install `cross-env`
-```sh
-npm install cross-env
-```
-
-To run this project in node, refer to the following commands:
-```sh
-npm run node:watch
-npm run node:start
-npm run node:build
 ```
 
 ### 4. Discord authentication

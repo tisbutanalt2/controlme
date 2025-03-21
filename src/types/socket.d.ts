@@ -5,8 +5,8 @@ declare global {
             type Callback<CB extends ((...args: Array<unknown>) => void) = (...args: Array<unknown>) => void> = (err?: string|false|null,...args: Parameters<CB>) => void;
     
             interface ServerEvents {
-                functions: (cb: (f: Record<string, boolean>) => void) => void;
-                invokeFunction: (name: string, props?: RSAny, res?: (res: ControlMe.FunctionResultObject & { success: true }) => void, rej?: (err?: string) => void) => void;
+                functions: (cb: (f: Array<ReducedFunction>) => void) => void;
+                invokeFunction: (name: string, props?: RSAny, res?: (res: ControlMe.FunctionResultObject) => void) => void;
             }
     
             interface ClientEvents {

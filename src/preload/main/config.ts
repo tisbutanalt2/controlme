@@ -1,7 +1,6 @@
 import { ipcRenderer } from 'electron';
 
 const configFunctions = {
-    getConfigValue: <T = any>(k: string) => ipcRenderer.invoke('config.get', k) as Promise<T>,
     setConfigValue: (k: string, v: any) => ipcRenderer.send('config.set', k, v),
     deleteConfigValue: (k: string) => ipcRenderer.send('config.delete'),
 

@@ -1,6 +1,8 @@
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, contextBridge } from 'electron';
 
 const baseContext = {
+    getConfigValue: <T = any>(k: string) => ipcRenderer.invoke('config.get', k) as Promise<T>,
+
     on: (channel: string, cb: Listener) => {
         const listener = (_e, ...args: Array<unknown>) =>
             cb(...args);
@@ -21,4 +23,11 @@ const baseContext = {
     writeToClipboard: (str: string) => ipcRenderer.send('clipboard.write', str)
 };
 
+declare global {
+    interface Window {
+        ipcShared: typeof baseContext;
+    }
+}
+
+contextBridge.exposeInMainWorld('ipcShared', baseContext);
 export default baseContext;

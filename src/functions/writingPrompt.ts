@@ -1,7 +1,7 @@
 import { DangerLevel, FieldType, PopupType } from 'enum';
 import context from 'ctx';
 
-import pickRandom from '@utils/array/pickRandom';
+import { displayPopup } from '@ipc/popup';
 
 interface Props {
     message?: string;
@@ -21,7 +21,7 @@ const writingPrompt: ControlMe.Function<Props, Options> = {
     dangerLevel: DangerLevel.Medium,
 
     title: 'Writing Prompt',
-    description: 'Displays a prompt where text must be written to remove it',
+    description: 'Displays a prompt where text must be written to remove it.',
 
     options: [
         {
@@ -43,14 +43,14 @@ const writingPrompt: ControlMe.Function<Props, Options> = {
             name: 'blackScreen',
             type: FieldType.Boolean,
             label: 'Black Screen',
-            description: 'Makes the entire screen black until the prompt is closed'
+            description: 'Makes the entire screen black until the prompt is closed.'
         },
 
         {
             name: 'allowImpossible',
             type: FieldType.Boolean,
             label: 'Allow potentially impossible prompt',
-            description: 'Allows writing prompts to have any kind of text'
+            description: 'Allows writing prompts to have any kind of text.'
         }
     ],
 
@@ -59,14 +59,14 @@ const writingPrompt: ControlMe.Function<Props, Options> = {
             name: 'message',
             type: FieldType.String,
             label: 'Message',
-            description: 'Optional message to display on top of the prompt'
+            description: 'Optional message to display alongside the prompt.'
         },
 
         {
             name: 'prompt',
             type: FieldType.String,
             label: 'Prompt',
-            description: 'The prompt to display on screen',
+            description: 'The prompt to display on screen.',
             required: true
         }
     ],
@@ -78,7 +78,7 @@ const writingPrompt: ControlMe.Function<Props, Options> = {
         return true;
     },
 
-    handler(props, options) {
+    async handler(props, options) {
         if (options.maxCount && currentCount >= options.maxCount)
             return 'The max amount of writing prompts are already displayed';
 
@@ -90,14 +90,8 @@ const writingPrompt: ControlMe.Function<Props, Options> = {
             blackScreen: options.blackScreen
         };
 
-        if (!context.modules.popup.length) return 'No popup windows are available';
-        if (!options.blackScreen) {
-            pickRandom(context.modules.popup).webContents.send('popup.writing', popup);
-        }
-
-        // TODO more stuff here
-
-        return true;
+        const res = await displayPopup(popup, 'writing', Boolean(options.blackScreen));
+        return res;
     }
 }
 

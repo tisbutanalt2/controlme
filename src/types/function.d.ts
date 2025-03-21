@@ -67,6 +67,9 @@ declare global {
 
             title: string;
             description: string;
+
+            /** Description displayed to the user. Defaults to the description. */
+            userDescription?: string;
     
             dangerLevel?: import('enum').DangerLevel;
             defaultEnabled?: boolean;
@@ -95,7 +98,16 @@ declare global {
             handler?: (parameters: Props, options: Options, user: Auth.User) => FunctionResult|Promise<FunctionResult>;
         }
 
-        type ReducedFunction = Omit<ControlMe.Function, 'handler'|'validateArgs'>
+        type ReducedFunction = Omit<
+            ControlMe.Function,
+            'handler' |
+            'validateArgs' |
+            'options' |
+            'dangerLevel' |
+            'defaultEnabled' |
+            'warning' |
+            'warnOnFalse'
+        >;
     }
 }
 

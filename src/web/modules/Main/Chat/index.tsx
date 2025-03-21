@@ -1,9 +1,9 @@
 const Chat = () => {
 
 
-    return <div>
-        <h1>Chat</h1>
-    </div>
+    return <main>
+        <h1>Chat coming soon...</h1>
+    </main>
 }
 
 export default Chat;

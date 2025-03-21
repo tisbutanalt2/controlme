@@ -186,7 +186,7 @@ let configStore: Store<ControlMe.Settings>;
 try {
     configStore = createStore();
 } catch(err) {
-    log(`Failed to parse config store: ${sanitizeError(err)}. Deleting...`);
+    log(`Failed to parse config store: ${sanitizeError(err)}. Resetting store...`, 'error');
     const userDataPath = app.getPath('userData');
     renameSync(join(userDataPath, 'config.json'), join(userDataPath, `config.backup.${unixTimestamp()}.json`));
     configStore = createStore();

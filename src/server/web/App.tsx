@@ -11,6 +11,8 @@ import Connect from './Connect';
 import Login from './Login';
 import Signup from './Signup';
 
+import Footer from './Footer';
+
 const Sub = () => {
     const [loaded, setLoaded] = useState<boolean>(false);
     const [data, setData] = useState<ControlMe.MinifiedWebData|undefined>({});
@@ -65,7 +67,10 @@ const Sub = () => {
 const App = () => {
     return <MemoryRouter initialEntries={['/loading']}>
         <WebProviders>
-            <Sub />
+            <div className="main">
+                <Sub />
+            </div>
+            <Footer />
         </WebProviders>
     </MemoryRouter>
 }

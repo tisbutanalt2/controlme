@@ -35,7 +35,7 @@ let chatStore: Store<ControlMe.Chat.Store>;
 try {
     chatStore = createStore();
 } catch(err) {
-    log(`Failed to parse chat store: ${sanitizeError(err)}. Deleting...`);
+    log(`Failed to parse chat store: ${sanitizeError(err)}. Resetting store...`, 'error');
     const userDataPath = app.getPath('userData');
     renameSync(join(userDataPath, 'chat.json'), join(userDataPath, `chat.backup.${unixTimestamp()}.json`));
     chatStore = createStore();

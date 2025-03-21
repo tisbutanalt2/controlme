@@ -90,6 +90,14 @@ export default function createTray() {
                     click: () => context.modules.notification?.webContents.isDevToolsOpened()
                         ? context.modules.notification?.webContents.closeDevTools()
                         : context.modules.notification?.webContents.openDevTools()
+                },
+
+                {
+                    label: 'Toggle devtools (popup)',
+                    click: () => context.modules.popup.forEach(win => win.webContents.isDevToolsOpened()
+                        ? win.webContents.closeDevTools()
+                        : win.webContents.openDevTools()
+                    )
                 }
             ]
         }

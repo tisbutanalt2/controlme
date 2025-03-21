@@ -60,7 +60,10 @@ export default function createMainWindow(show: boolean = true) {
     });
 
     if (isDev) {
-        win.on('focus', () => globalShortcut.register('CommandOrControl+R', () => win.webContents.reload()));
+        win.on('focus', () => globalShortcut.register('CommandOrControl+R', () => {
+            if (!win.isFocused()) return globalShortcut.unregister('CommandOrControl+R');
+            win.webContents.reload();
+        }));
         win.on('blur', () => globalShortcut.unregister('CommandOrControl+R'));
     }
     

@@ -10,6 +10,7 @@ const imagePopup: ControlMe.Function = {
 
     title: 'Image Popup',
     description: 'Displays image popups on any of your screens.',
+    userDescription: 'Display an image popup on the screen.',
 
     options: [
         {

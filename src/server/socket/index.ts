@@ -27,8 +27,14 @@ export default function setupSockets(server: Server) {
         const authDisabled = configStore.get('security.disableAuth') as boolean;
         const cookies = parse(socket.handshake.headers.cookie) as { jwt?: string };
 
-        const jwt = cookies?.jwt;
-        if (!jwt && !authDisabled) return next(new Error('Missing JWT'));
+        let jwt = cookies?.jwt;
+        if (!jwt && !authDisabled) {
+            const jwtMatch = String(socket.handshake.headers.authorization ?? socket.handshake.headers.Authorization).match(/^bearer (.+)$/i);
+            if (jwtMatch)
+                jwt = jwtMatch[1];
+
+            else if (!authDisabled) return next(new Error('Missing JWT'));
+        }
 
         let user = !authDisabled && decodeUserToken(jwt);
 

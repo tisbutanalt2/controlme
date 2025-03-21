@@ -1,6 +1,7 @@
 declare global {
     namespace ControlMe {
         type Popup = {
+            id?: string;
             type: import('enum').PopupType;
 
             /** Timeout in milliseconds before the popup disappears */

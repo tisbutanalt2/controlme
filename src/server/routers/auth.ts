@@ -139,4 +139,6 @@ authRouter.delete('/auth/delete', requireLoggedIn(false), (req, res) => {
     res.send('Ok');
 });
 
+authRouter.get('/auth/jwt', requireLoggedIn(false), (req, res) => res.send(req.cookies.jwt));
+
 export default authRouter;

@@ -21,6 +21,7 @@ const Login = () => {
     const [submitError, setSubmitError] = useState<string|undefined>();
 
     useEffect(() => {
+        if (!form.username && !form.password) return setErrors({});
         if (!form.username || !form.password) return setErrors({
             username: form.username ? undefined : 'This field is required',
             password: form.password ? undefined : 'This field is required'
@@ -75,7 +76,7 @@ const Login = () => {
             onClick={submit}
             sx={{ mt: '12px' }}
             color="success"
-            disabled={!!Object.keys(errors).length || submitting}
+            disabled={!!Object.keys(errors).length || submitting || !form.username || !form.password}
         >Submit</UI.Button>
 
         {submitError && <pre style={{ marginTop: '8px' }} className="error">Error submitting form: {submitError}</pre>}

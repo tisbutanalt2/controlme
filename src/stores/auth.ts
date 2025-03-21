@@ -109,7 +109,7 @@ let authStore: Store<Auth.Store>;
 try {
     authStore = createStore();
 } catch(err) {
-    log(`Failed to parse auth store: ${sanitizeError(err)}. Deleting...`);
+    log(`Failed to parse auth store: ${sanitizeError(err)}. Resetting store...`, 'error');
     const userDataPath = app.getPath('userData');
     renameSync(join(userDataPath, 'auth.json'), join(userDataPath, `auth.backup.${unixTimestamp()}.json`));
     authStore = createStore();

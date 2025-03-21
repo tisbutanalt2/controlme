@@ -23,6 +23,8 @@ const Signup = () => {
     const [submitError, setSubmitError] = useState<string|undefined>();
 
     useEffect(() => {
+        if (!form.username && !form.password) return setErrors({});
+
         const res = validateSignup(form.username, form.password);
         if (res === true) return setErrors({});
 
@@ -85,7 +87,7 @@ const Signup = () => {
             onClick={submit}
             sx={{ mt: '12px' }}
             color="success"
-            disabled={!!Object.keys(errors).length || submitting}
+            disabled={!!Object.keys(errors).length || submitting || !form.username || !form.password}
         >Submit</UI.Button>
 
         {submitError && <pre style={{ marginTop: '8px' }} className="error">Error submitting form: {submitError}</pre>}

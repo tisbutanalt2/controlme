@@ -21,6 +21,10 @@ export default async function invokeFunction(name: string, user: Auth.User, prop
     log(`${userLabel(user)} called function ${name} with parameters:\n${JSON.stringify(props, null, 4)}`);
     const options = (configStore.get(`functions.${name}.options`) || {}) as RSAny;
 
+    func.parameters?.forEach(param => {
+        if (props[param.name] === undefined) props[param.name] = param.defaultValue;
+    });
+
     const validateRes = func.validateArgs?.(
         props,
         options,

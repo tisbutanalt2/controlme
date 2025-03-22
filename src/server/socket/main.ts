@@ -31,13 +31,16 @@ export default function handleSocket(socket: Socket<S.ServerEvents, S.ClientEven
         cb(getAvailableFolders(socket.data.user, t));
     });
 
-    socket.on('folderContents', (id, cb, offset = 0, maxItems = 32) => {
+    socket.on('folderContents', (id, fileType = [], offset = 0, maxItems = 32, cb) => {
+        if (fileType !== undefined && !(fileType instanceof Array)) fileType = [fileType];
         const folders = getAvailableFolders(socket.data.user);
 
-        const folder = folders.find(f => f.name === id);
+        const folder = folders.find(f => f.id === id);
         if (!folder) return cb([]);
 
-        const contents = getFolderContents(folder.path);
+        let contents = getFolderContents(folder.path);
+        if (fileType instanceof Array) contents = contents.filter(f => fileType.includes(f.t));
+
         cb(contents.slice(offset, offset + maxItems));
     });
 

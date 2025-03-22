@@ -1,12 +1,31 @@
 import { ipcMain } from 'electron';
 import context from 'ctx';
 
+import configStore from '@stores/config';
 import pickRandom from '@utils/array/pickRandom';
+
 import { randomUUID } from 'crypto';
+import { PopupType } from 'enum';
+import { pathToFileURL } from 'url';
+import { join } from 'path';
 
 export const displayPopup = (popup: ControlMe.Popup, popupType: string, sendToSub: boolean = false) => {
     if (!context.modules.popup.length) return Promise.resolve<string>('No popup windows are available');
     const id = popup.id ?? randomUUID();
+
+    if (popup.type === PopupType.Image || popup.type === PopupType.Video || popup.type === PopupType.Audio) {
+        if (!popup.folderId || !popup.src)
+            throw new Error('src or folderId is missing');
+
+        const folders = configStore.get('folders');
+
+        const folder = folders?.find(f => f.id === popup.folderId);
+        if (!folder) throw new Error('Folder not found');
+
+        popup.fullPath = pathToFileURL(
+            join(folder.path, popup.src)
+        ).href;
+    }
 
     const target = pickRandom(context.modules.popup);
     target.webContents.send('popup', {

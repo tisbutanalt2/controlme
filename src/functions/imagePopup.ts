@@ -1,10 +1,14 @@
 import context from 'ctx';
-import { DangerLevel, FieldType } from 'enum';
+import { DangerLevel, FieldType, FileType, FolderType, PopupType } from 'enum';
 
 import pickRandom from '@utils/array/pickRandom';
-import { globPatterns } from 'const';
+import { displayPopup } from '@ipc/popup';
 
-const imagePopup: ControlMe.Function = {
+let currentCount = 0;
+const imagePopup: ControlMe.Function<
+    { src: ControlMe.TargetFile; nonClosable?: boolean },
+    { maxCount?: number; maxTime?: number }
+> = {
     name: 'imagePopup',
     dangerLevel: DangerLevel.Low,
 
@@ -35,7 +39,8 @@ const imagePopup: ControlMe.Function = {
             name: 'src',
             type: FieldType.File,
             required: true,
-            glob: globPatterns.image,
+            fileType: FileType.Image,
+            folderType: [FolderType.Image, FolderType.Media],
             label: 'Image'
         },
 
@@ -44,16 +49,25 @@ const imagePopup: ControlMe.Function = {
             type: FieldType.Boolean,
             requiredPermission: 'nonClosablePopup',
             label: 'Non-closable',
-            description: 'Prevents the popup from being closed.'
+            description: 'Prevents the popup from being closed.',
+            defaultValue: false
         }
     ],
 
-    handler: (props: ControlMe.Popup & { type: import('enum').PopupType.Image }) => {
-        if (!context.modules.popup?.length) return 'No popup windows are available';
-        const popupWindow = pickRandom(context.modules.popup);
+    async handler(props, options) {
+        if (options.maxCount && currentCount >= options.maxCount)
+            return 'The max amount of writing prompts are already displayed';
 
-        popupWindow.webContents.send('popup', props);
-        return true;
+        const popup: ControlMe.Popup = {
+            type: PopupType.Image,
+            src: props.src.file,
+            closable: !props.nonClosable,
+            folderId: props.src.folder,
+            timeout: options.maxTime
+        };
+
+        const res = await displayPopup(popup, 'image');
+        return res;
     }
 };
 

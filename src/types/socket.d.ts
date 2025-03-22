@@ -6,7 +6,13 @@ declare global {
     
             interface ServerEvents {
                 folders: (cb: (f: Array<ReducedFolder>) => void, folderType?: import('enum').FolderType) => void;
-                folderContents: (id: string, cb: (files: Array<ControlMe.ShortFile>) => void, offset?: number, maxItems?: number) => void;
+                folderContents: (
+                    id: string,
+                    type?: import('enum').FileType|Array<import('enum').FileType>,
+                    offset?: number,
+                    maxItems?: number,
+                    cb: (files: Array<ControlMe.ShortFile>) => void
+                ) => void;
 
                 functions: (cb: (f: Array<ReducedFunction>) => void) => void;
                 invokeFunction: (name: string, props?: RSAny, res?: (res: ControlMe.FunctionResultObject) => void) => void;

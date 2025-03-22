@@ -19,7 +19,9 @@ import InputLabel from '@muim/InputLabel';
 import FormHelperText from '@muim/FormHelperText';
 
 import Divider from '@muim/Divider';
+import MenuList from '@muim/MenuList';
 import MenuItem from '@muim/MenuItem';
+import ListItemIcon from '@muim/ListItemIcon';
 
 import Dialog from '@muim/Dialog';
 import DialogTitle from '@muim/DialogTitle';
@@ -50,7 +52,9 @@ const MUI = {
     HelperText: FormHelperText,
 
     Divider,
+    MenuList,
     MenuItem,
+    ListItemIcon,
 
     Dialog,
     DialogTitle,

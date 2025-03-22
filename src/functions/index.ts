@@ -1,6 +1,7 @@
 import openUrl from './openUrl';
 import imagePopup from './imagePopup';
 import writingPrompt from './writingPrompt';
+import setWallpaper from './setWallpaper';
 
 // Array of functions and "dummy" functions for permissions
 const functions: Array<ControlMe.Function<unknown, unknown>> = [
@@ -27,6 +28,7 @@ const functions: Array<ControlMe.Function<unknown, unknown>> = [
         custom: true
     },
     openUrl,
+    setWallpaper,
     imagePopup,
     writingPrompt,
     {

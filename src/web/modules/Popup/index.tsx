@@ -3,6 +3,7 @@ import { PopupType } from 'enum';
 
 import ColorModeProvider from '@providers/ColorMode';
 
+import ImagePopup from './Image';
 import WritingPrompt from './WritingPrompt';
 
 const popupType = (t) => t === PopupType.Image
@@ -43,9 +44,13 @@ const Sub = () => {
             setPopups(prev => prev.filter(p => p.id !== id));
         });
     }, [mounted]);
+
+    console.log(popups);
     
     return popups.map((popup, i) => {
         switch(popup.type) {
+            case PopupType.Image:
+                return <ImagePopup key={i} {...popup} onClose={() => onClose(popup.id, 'image')} />
             case PopupType.Writing:
                 return <WritingPrompt key={i} {...popup} onClose={() => onClose(popup.id, 'writing')} />
             default:

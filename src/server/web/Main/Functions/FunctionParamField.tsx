@@ -1,7 +1,7 @@
 import UI from '@components/ui';
 import { FieldType } from 'enum';
 
-import FileSelect from '../FileSelect';
+import { FileSelectButton} from '../FileSelect';
 
 const FunctionParamField: FC<ControlMe.FunctionParamField & {
     value?: unknown;
@@ -43,10 +43,14 @@ const FunctionParamField: FC<ControlMe.FunctionParamField & {
                 sx={props.sx}
                 error={props.error}
             />
-        /*case FieldType.File: // TODO this needs to be wrapped in a button
-            <FileSelect
+        case FieldType.File:
+            return <FileSelectButton
                 fileType={props.fileType}
-            />*/
+                folderType={props.folderType}
+                label={props.label}
+                value={props.value as ControlMe.TargetFile}
+                onChange={props.onChange}
+            />
 
         default:
             console.warn(`FieldType ${props.type} is not implemented`);

@@ -18,18 +18,21 @@ declare global {
 
             /** Defined if src is from a shared folder */
             folderId?: string;
+            fullPath?: string;
         } | {
             type: import('enum').PopupType.Video;
             src: string;
 
             /** Defined if src is from a shared folder */
             folderId?: string;
+            fullPath?: string;
         } | {
             type: import('enum').PopupType.Audio;
             src: string;
 
             /** Defined if src is from a shared folder */
             folderId?: string;
+            fullPath?: string;
 
             /** Custom close icon */
             iconSrc?: string;

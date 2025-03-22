@@ -13,9 +13,9 @@ Features are marked with a checkbox which determines whether it has been impleme
 - [ ] Change wallpaper
 - [ ] Image popups
 - [ ] Video popups
-- [ ] Writing prompts
+- [x] Writing prompts
 - [ ] Play audio
-- [ ] Open URLs
+- [x] Open URLs
 - [ ] Webcam photo
 - [ ] Take screenshots
 - [ ] Upload files

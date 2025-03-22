@@ -41,5 +41,22 @@ export enum PopupType {
     Image = 0,
     Video = 1,
     Audio = 2,
-    Writing = 3 // TODO Some window gets main caller, other windows get subcall to cover the entire screen? 
+    Writing = 3 
+};
+
+// Used for shared folders
+export enum FolderType {
+    Custom = 0,
+    File = 1,
+    Media = 2,
+    Image = 3,
+    Video = 4,
+    Audio = 5,
+};
+
+export enum FileType {
+    Generic = 0,
+    Image = 1,
+    Video = 2,
+    Audio = 3
 };

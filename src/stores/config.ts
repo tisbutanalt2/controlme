@@ -5,15 +5,25 @@ import { renameSync } from 'fs';
 import { join } from 'path';
 
 import { defaultSettings } from 'const';
+import { FolderType } from 'enum';
+
+import { randomUUID } from 'crypto';
 
 import log from 'log';
 import sanitizeError from '@utils/sanitizeError';
 import unixTimestamp from '@utils/unixTimestamp';
 
+const userDataPath = app.getPath('userData');
+
 const sharedFolder = {
     type: 'object',
     properties: {
         name: { type: 'string' },
+        type: {
+            type: 'number',
+            enum: Object.values(FolderType) as Array<number>
+        },
+        glob: { type: 'string' },
         path: { type: 'string' },
         id: { type: 'string' },
         allowedUsers: {
@@ -21,13 +31,30 @@ const sharedFolder = {
             items: { type: 'string' }
         }
     },
-    required: ['path', 'id']
+    required: ['path', 'id', 'type']
 } as const;
 
 const createStore = () => new Store<ControlMe.Settings>({
     name: 'config',
     watch: true,
-    defaults: defaultSettings,
+    defaults: {
+        ...defaultSettings,
+        folders: [
+            {
+                id: randomUUID(),
+                type: FolderType.File,
+                name: 'Files',
+                path: join(userDataPath, 'Files')
+            },
+
+            {
+                id: randomUUID(),
+                type: FolderType.Media,
+                name: 'Media',
+                path: join(userDataPath, 'Media')
+            }
+        ]
+    },
     schema: {
         general: {
             type: 'object',
@@ -79,19 +106,9 @@ const createStore = () => new Store<ControlMe.Settings>({
 
         webcamDevice: { type: 'string' },
 
-        files: {
-            type: 'object',
-            properties: {
-                mediaFolders: {
-                    type: 'array',
-                    items: sharedFolder as unknown
-                },
-                fileFolders: {
-                    type: 'array',
-                    items: sharedFolder as unknown
-                }
-            },
-            required: ['mediaFolders', 'fileFolders']
+        folders: {
+            type: 'array',
+            items: sharedFolder as unknown
         },
 
         security: {
@@ -190,7 +207,6 @@ try {
     configStore = createStore();
 } catch(err) {
     log(`Failed to parse config store: ${sanitizeError(err)}. Resetting store...`, 'error');
-    const userDataPath = app.getPath('userData');
     renameSync(join(userDataPath, 'config.json'), join(userDataPath, `config.backup.${unixTimestamp()}.json`));
     configStore = createStore();
 }

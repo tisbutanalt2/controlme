@@ -6,13 +6,16 @@ import UI from '@components/ui';
 import AddIcon from '@muii/Add';
 import FolderIcon from '@muii/Folder';
 import DeleteIcon from '@muii/DeleteForever';
-import EditIcon from '@muii/Edit';
+import { FolderType } from 'enum';
+//import EditIcon from '@muii/Edit';
 
 const maxPathLength = 96;
 
 const Folder: FC <ControlMe.SharedFolder & {
     onFolderChange: (path: string) => void,
     onNameChange: (path: string) => void,
+    onTypeChange: (type: FolderType) => void,
+    onGlobChange: (glob: string) => void,
     onDelete: () => void
 }> = props => {
     if (!props.path) return null;
@@ -64,6 +67,43 @@ const Folder: FC <ControlMe.SharedFolder & {
                 </UI.MUI.IconButton>
             </UI.MUI.Tooltip>
         </UI.Stack>
+        <UI.Stack>
+            <UI.Field
+                type="select"
+                value={props.type}
+                label="Type"
+                sx={{ minWidth: '120px' }}
+                options={[
+                    { value: FolderType.File, label: 'Files' },
+                    { value: FolderType.Media, label: 'Media' },
+                    { value: FolderType.Image, label: 'Images' },
+                    { value: FolderType.Video, label: 'Videos' },
+                    { value: FolderType.Audio, label: 'Audio' },
+                    { value: FolderType.Custom, label: 'Custom' }
+                ]}
+                onChange={v => props.onTypeChange(v)}
+            />
+
+            {props.type === FolderType.Custom && <UI.Field
+                type="text"
+                value={props.glob}
+                label="Glob Pattern"
+                onChange={v => props.onGlobChange(v)}
+                sx={{ minWidth: '160px' }}
+            />}
+        </UI.Stack>
+
+        {props.type === FolderType.Custom && <UI.MUI.HelperText>
+            Custom folders require a glob pattern to define which file types are allowed.    
+        </UI.MUI.HelperText>}
+
+        {props.type === FolderType.File && <UI.MUI.HelperText>
+            File folders accept any type of file.
+        </UI.MUI.HelperText>}
+
+        {props.type === FolderType.Media && <UI.MUI.HelperText>
+            Media folders accept images, videos and audio files.
+        </UI.MUI.HelperText>}
     </>
 }
 
@@ -94,36 +134,51 @@ const FileSettings = () => {
             >Default Media Folder</UI.Button>
         </UI.Stack>
 
-        <h2>Custom File Folders</h2>
+        <h2>Shared Folders</h2>
         <UI.MUI.HelperText>
-            File folders accept any type of file. They will only be
-            available to a user if they have access to upload any file.
+            You may set up custom folders to share to users.
+            Folders will only be available to users you've
+            explicitly given access. If you don't specify
+            any users, the folder will be available to anyone
+            with access to upload files of the given type.
         </UI.MUI.HelperText>
 
-        {settings.files.fileFolders?.map((folder, i) => <Folder
+        {settings.folders?.map((folder, i) => <Folder
             key={i}
-            id={folder.id}
-            name={folder.name}
-            path={folder.path}
-            allowedUsers={folder.allowedUsers}
+            {...folder}
             onFolderChange={v => {
                 setSettings(prev => {
-                    const copy = { ...prev, files: { ...prev.files } };
-                    copy.files.fileFolders[i].path = v;
+                    const copy = { ...prev, folders: [ ...prev.folders ] };
+                    copy.folders[i].path = v;
                     return copy;
-                })
+                });
             }}
             onNameChange={v => {
                 setSettings(prev => {
-                    const copy = { ...prev, files: { ...prev.files } };
-                    copy.files.fileFolders[i].name = v;
+                    const copy = { ...prev, folders: [ ...prev.folders ] };
+                    copy.folders[i].name = v;
                     return copy;
-                })
+                });
+            }}
+            onTypeChange={v => {
+                setSettings(prev => {
+                    const copy = { ...prev, folders: [ ...prev.folders ] };
+                    copy.folders[i].type = v;
+                    v !== FolderType.Custom && (copy.folders[i].glob = '');
+                    return copy;
+                });
+            }}
+            onGlobChange={v => {
+                setSettings(prev => {
+                    const copy = { ...prev, folders: [ ...prev.folders ] };
+                    copy.folders[i].glob = v;
+                    return copy;
+                });
             }}
             onDelete={() => {
                 setSettings(prev => {
-                    const copy = { ...prev, files: { ...prev.files }};
-                    copy.files.fileFolders.splice(i, 1);
+                    const copy = { ...prev, folders: [ ...prev.folders ] };
+                    copy.folders.splice(i, 1);
                     return copy;
                 })
             }}
@@ -140,71 +195,12 @@ const FileSettings = () => {
                     if (!res) return;
                     
                     setSettings(prev => {
-                        const copy = { ...prev, files: { ...prev.files } };
-                        const folders = copy.files.fileFolders ??= [];
+                        const copy = { ...prev, folders: [ ...prev.folders ] };
+                        const folders = copy.folders ??= [];
                         folders.push({
                             ...res,
-                            id: randomUUID()
-                        });
-                        return copy;
-                    });
-                })
-            }}
-        >
-            <AddIcon />
-        </UI.Button>
-
-        <h2>Custom Media Folders</h2>
-        <UI.MUI.HelperText>
-            Media folders only accept images, videos and audio files. They will only be
-            available to a user if they have access to upload media.
-        </UI.MUI.HelperText>
-
-        {settings.files.mediaFolders?.map((folder, i) => <Folder
-            key={i}
-            id={folder.id}
-            name={folder.name}
-            path={folder.path}
-            allowedUsers={folder.allowedUsers}
-            onFolderChange={v => {
-                setSettings(prev => {
-                    const copy = { ...prev, files: { ...prev.files } };
-                    copy.files.mediaFolders[i].path = v;
-                    return copy;
-                })
-            }}
-            onNameChange={v => {
-                setSettings(prev => {
-                    const copy = { ...prev, files: { ...prev.files } };
-                    copy.files.mediaFolders[i].name = v;
-                    return copy;
-                })
-            }}
-            onDelete={() => {
-                setSettings(prev => {
-                    const copy = { ...prev, files: { ...prev.files }};
-                    copy.files.mediaFolders.splice(i, 1);
-                    return copy;
-                })
-            }}
-        />)}
-
-        <UI.Button
-            variant="outlined"
-            color="success"
-            sx={{
-                mt: '8px'
-            }}
-            onClick={() => {
-                window.ipcMain.selectFolder().then(res => {
-                    if (!res) return;
-                    
-                    setSettings(prev => {
-                        const copy = { ...prev, files: { ...prev.files } };
-                        const folders = copy.files.mediaFolders ??= [];
-                        folders.push({
-                            ...res,
-                            id: randomUUID()
+                            id: randomUUID(),
+                            type: FolderType.Custom
                         });
                         return copy;
                     });

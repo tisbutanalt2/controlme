@@ -10,6 +10,8 @@ import invokeFunction from '@utils/server/invokeFunction';
 import configStore from '@stores/config';
 import getFunctionAccess from '@utils/server/getFunctionAccess';
 
+import getAvailableFolders from '@utils/server/getAvailableFolders';
+import getFolderContents from '@utils/server/getFolderContents';
 import userLabel from '@utils/string/userLabel';
 
 export default function handleSocket(socket: Socket<S.ServerEvents, S.ClientEvents, S.InternalEvents, S.Data>) {
@@ -23,6 +25,20 @@ export default function handleSocket(socket: Socket<S.ServerEvents, S.ClientEven
         if (index >= 0) context.sockets.splice(index, 1);
 
         log(`${label} disconnected`, 'info', false);
+    });
+
+    socket.on('folders', (cb, t) => {
+        cb(getAvailableFolders(socket.data.user, t));
+    });
+
+    socket.on('folderContents', (id, cb, offset = 0, maxItems = 32) => {
+        const folders = getAvailableFolders(socket.data.user);
+
+        const folder = folders.find(f => f.name === id);
+        if (!folder) return cb([]);
+
+        const contents = getFolderContents(folder.path);
+        cb(contents.slice(offset, offset + maxItems));
     });
 
     socket.on('functions', cb => {

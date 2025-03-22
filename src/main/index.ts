@@ -3,7 +3,9 @@ import { app, dialog, globalShortcut } from 'electron';
 import { autoUpdater } from 'electron-updater';
 autoUpdater.autoDownload = false;
 
-import { existsSync, mkdirSync } from 'fs';
+import { join } from 'path';
+import { existsSync, mkdirSync, rmSync, readdirSync } from 'fs';
+
 import AutoLaunch from 'auto-launch';
 
 import context from 'ctx';
@@ -35,10 +37,16 @@ const autoLauncher = new AutoLaunch({
 });
 
 // Create folders if they don't exist
-if (!existsSync(context.fileFolder)) mkdirSync(context.fileFolder);
-if (!existsSync(context.mediaFolder)) mkdirSync(context.mediaFolder);
+if (!existsSync(context.defaultFileFolder)) mkdirSync(context.defaultFileFolder);
+if (!existsSync(context.defaultMediaFolder)) mkdirSync(context.defaultMediaFolder);
 if (!existsSync(context.logFolder)) mkdirSync(context.logFolder);
 if (!existsSync(context.tempFolder)) mkdirSync(context.tempFolder);
+
+// Delete existing temp files
+try {
+    const files = readdirSync(context.tempFolder);
+    files.forEach(f => rmSync(join(context.tempFolder, f)));
+} catch {}
 
 app.on('ready', async () => {
     if (!isDev) {

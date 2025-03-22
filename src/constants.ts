@@ -33,10 +33,7 @@ export const defaultSettings: ControlMe.Settings = {
         }
     },
 
-    files: {
-        mediaFolders: [],
-        fileFolders: []
-    },
+    folders: [], // Default folders injected in config.ts
 
     security: {
         disablePanicKeybind: false,
@@ -83,6 +80,7 @@ export const settingsTabs: Array<{ name: string; label: string }> = [
 ];
 
 export const globPatterns = {
+    media: '*.{jpg,jpeg,png,gif,webp,avif,svg,bmp,mp4,webm,ogg,mp3,wav,aac,flac,opus,m4a}',
     image: '*.{jpg,jpeg,png,gif,webp,avif,svg,bmp}',
     video: '*.{mp4,webm,ogg}',
     audio: '*.{mp3,wav,ogg,aac,flac,opus,webm,m4a}'

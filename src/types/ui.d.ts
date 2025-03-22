@@ -58,8 +58,8 @@ declare global {
         }
 
         interface SelectFieldProps {
-            value?: string;
-            defaultValue?: string;
+            value?: unknown;
+            defaultValue?: unknown;
 
             options?: { label: string; value: unknown }[];
             onChange?(v?: string): void;

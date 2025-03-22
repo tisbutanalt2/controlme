@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react';
 
 export interface Connection {
+    folders: Array<ControlMe.ReducedFolder>;
     functions: Array<ControlMe.ReducedFunction>;
     availableFunctions: Set<string>;
     socket: ControlMe.ClientSocket;

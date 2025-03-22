@@ -1,3 +1,4 @@
+import openUrl from './openUrl';
 import imagePopup from './imagePopup';
 import writingPrompt from './writingPrompt';
 
@@ -10,6 +11,22 @@ const functions: Array<ControlMe.Function<unknown, unknown>> = [
         hidden: true,
         custom: true
     },
+    // Any filetype
+    {
+        name: 'uploadAnyFile',
+        title: 'Upload any File',
+        description: 'Allows uploading any file type',
+        hidden: true,
+        custom: true
+    },
+    {
+        name: 'uploadMedia',
+        title: 'Upload media Files',
+        description: 'Allows uploading media files',
+        hidden: true,
+        custom: true
+    },
+    openUrl,
     imagePopup,
     writingPrompt,
     {
@@ -17,7 +34,11 @@ const functions: Array<ControlMe.Function<unknown, unknown>> = [
         title: 'Non-closable Popup',
         description: 'If enabled, will allow popups to be impossible to close.',
         hidden: true
-    },
-];
+    }
+].filter(func => {
+    if (!func.supportedOs) return true;
+    return ((func.supportedOs instanceof Array) ? func.supportedOs : [func.supportedOs])
+        .some(os => process.platform === os)
+});
 
 export default functions;

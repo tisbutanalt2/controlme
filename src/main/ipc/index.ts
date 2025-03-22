@@ -43,9 +43,9 @@ ipcMain.on('folder.open', (_e, path: string) => {
 })
 
 ipcMain.on('folder.openDefaultFiles', () => {
-    shell.openPath(context.fileFolder);
+    shell.openPath(context.defaultFileFolder);
 });
 
 ipcMain.on('folder.openDefaultMedia', () => {
-    shell.openPath(context.mediaFolder);
+    shell.openPath(context.defaultMediaFolder);
 });

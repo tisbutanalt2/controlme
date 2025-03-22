@@ -59,8 +59,8 @@ const context = {
 
     userDataPath,
 
-    fileFolder: join(userDataPath, 'Files'),
-    mediaFolder: join(userDataPath, 'Media'),
+    defaultFileFolder: join(userDataPath, 'Files'),
+    defaultMediaFolder: join(userDataPath, 'Media'),
     logFolder: join(userDataPath, 'Logs'),
     tempFolder: join(userDataPath, 'Temp'),
 

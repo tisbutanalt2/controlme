@@ -37,6 +37,9 @@ declare global {
 
             sx?: import('@muim/styles').SxProps;
 
+            fileType?: import('enum').FileType | Array<import('enum').FileType>;
+            folderType?: import('enum').FolderType | Array<import('enum').FolderType>;
+
             /** Optional glob pattern for file types if field is of type File */
             glob?: string;
 
@@ -72,6 +75,9 @@ declare global {
 
             title: string;
             description: string;
+
+            /** If the function only supports a specific OS, this can be filled */
+            supportedOs?: string|Array<string>;
 
             /** Description displayed to the user. Defaults to the description. */
             userDescription?: string;

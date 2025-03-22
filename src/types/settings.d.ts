@@ -1,15 +1,5 @@
 declare global {
     namespace ControlMe {
-        interface SharedFolder {
-            id: string;
-            
-            name: string;
-            path: string;
-
-            /** Optional array of users who can see the folder */
-            allowedUsers?: Array<string>;
-        }
-
         interface Settings {
             general: {
                 disableWarnings: boolean;
@@ -28,10 +18,7 @@ declare global {
             functions: Record<string, StoredFunction>;
             webcamDevice?: string;
 
-            files: {
-                mediaFolders: Array<SharedFolder>;
-                fileFolders: Array<SharedFolder>;
-            };
+            folders: Array<SharedFolder>;
 
             security: {
                 disablePanicKeybind: boolean;

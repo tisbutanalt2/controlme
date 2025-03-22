@@ -30,8 +30,15 @@ const Connect = () => {
                 const availableFunctions = new Set<string>();
                 functions.forEach(func => availableFunctions.add(func.name));
 
-                setConnection({ socket, functions, availableFunctions });
-                navigate('/');
+                socket.emit('folders', folders => {
+                    setConnection({
+                        socket,
+                        functions,
+                        availableFunctions,
+                        folders
+                    });
+                    navigate('/');
+                });
             });
         });
 

@@ -5,6 +5,9 @@ declare global {
             type Callback<CB extends ((...args: Array<unknown>) => void) = (...args: Array<unknown>) => void> = (err?: string|false|null,...args: Parameters<CB>) => void;
     
             interface ServerEvents {
+                folders: (cb: (f: Array<ReducedFolder>) => void, folderType?: import('enum').FolderType) => void;
+                folderContents: (id: string, cb: (files: Array<ControlMe.ShortFile>) => void, offset?: number, maxItems?: number) => void;
+
                 functions: (cb: (f: Array<ReducedFunction>) => void) => void;
                 invokeFunction: (name: string, props?: RSAny, res?: (res: ControlMe.FunctionResultObject) => void) => void;
             }

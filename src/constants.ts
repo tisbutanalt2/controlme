@@ -1,4 +1,5 @@
 import type { TabProps } from '@components/Tabs';
+import { FolderType } from 'enum';
 
 export const isDev = process.env.NODE_ENV === 'development';
 export const appTitle = 'Control Me!';
@@ -34,6 +35,7 @@ export const defaultSettings: ControlMe.Settings = {
     },
 
     folders: [], // Default folders injected in config.ts
+    files: {},
 
     security: {
         disablePanicKeybind: false,
@@ -85,3 +87,9 @@ export const globPatterns = {
     video: '*.{mp4,webm,ogg}',
     audio: '*.{mp3,wav,ogg,aac,flac,opus,webm,m4a}'
 } as const;
+
+export const folderMimeTypes: Partial<Record<FolderType, string>> = {
+    [FolderType.Image]: 'image/',
+    [FolderType.Video]: 'video/',
+    [FolderType.Audio]: 'audio/'
+};

@@ -19,6 +19,10 @@ declare global {
             webcamDevice?: string;
 
             folders: Array<SharedFolder>;
+            files: {
+                maxSizeBytes?: number;
+                maxUploadCount?: number;
+            };
 
             security: {
                 disablePanicKeybind: boolean;

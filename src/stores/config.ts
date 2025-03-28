@@ -111,6 +111,14 @@ const createStore = () => new Store<ControlMe.Settings>({
             items: sharedFolder as unknown
         },
 
+        files: {
+            type: 'object',
+            properties: {
+                maxSizeBytes: { type: 'number' },
+                maxUploadCount: { type: 'number' }
+            }
+        },
+
         security: {
             type: 'object',
             properties: {
